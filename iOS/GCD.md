@@ -62,3 +62,34 @@ Grand CentralDispatch
 - `wait()`
 - `siginal()`
 
+
+## 常用场景
+### 耗时任务
+```swift
+// 耗时任务
+let item1 = DispatchWorkItem {
+    print("work item 1")
+}
+// 更新UI
+let item2 = DispatchWorkItem {
+    print("work item 2")
+}
+// 自定义低优先级队列
+let myQueue = DispatchQueue(label: "com.expensive.queue", qos: .background, attributes: [], autoreleaseFrequency: .workItem, target: DispatchQueue.global())
+
+// 在低优先级队列执行耗时任务 item1，执行结束之后在主队列执行更新UI任务 item2
+// 方案一：
+// 执行耗时任务
+myQueue.async(execute: item1)
+// 耗时任务完成之后通知主队列执行更新UI任务
+item1.notify(queue: DispatchQueue.main, execute: item2)
+
+// 方案二：
+// 执行耗时任务
+myQueue.async(execute: item1)
+// 等待耗时任务完成
+item1.wait()
+// 耗时任务完成之后在主队列执行更新UI任务
+DispatchQueue.main.async(execute: item2)
+```
+
