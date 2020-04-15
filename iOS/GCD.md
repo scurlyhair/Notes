@@ -37,12 +37,18 @@ Grand CentralDispatch
 #### 属性
 - **qos: DispatchQos** 优先级
 - **flags: DispatchWorkItemFlags**  执行标识
-	- `barrier` 阻塞方式
-	- `detached`
-	- `assignCurrentContext`
-	- `noQoS`
-	- `inheritQoS`
-	- `enforceQoS`
+	- `barrier`。 这个是比较常用的参数。如果`DispatchWorkItem`被提交到`.concurrent`并发队列，那么这个`DispatchWorkItem`中的操作会具有独占性(防止此`DispatchWorkItem`中的`block`内的操作与其他操作同时执行)。
+如果直接执行这个`DispatchWorkItem`，没有任何效果
+	- `detached`。 表明`DispatchWorkItem`会无视当前执行上下文的参数(`QoS class`, `os_activity_t` 和进程间通信请求参数)。
+如果直接执行`DispatchWorkItem`，在复制这些属性给这个`block`前，`block`在执行期间会移除在调用线程中的这些属性。
+如果`DispatchWorkItem`被添加到队列中，`block`在执行时会采用队列的属性，或者赋值给`block`的属性
+	- `assignCurrentContext`。 表明`DispatchWorkItem`在被创建时，应该被指定执行上下文参数。这些参数包括：`QoS class`, `os_activity_t` 和进程间通信请求参数。
+如果`DispatchWorkItem`被直接调用，`DispatchWorkItem`在调用的线程中将采用这些参数。
+如果`DispatchWorkItem`被提交到队列中，这些参数会被提交时的执行上下文中的参数替代。
+如果`QoS`类为`DISPATCH_BLOCK_NO_QOS_CLASS`或`dispatch_block_create_with_qos_class`生成的值，那么这个值会取代当前的值。
+	- `noQoS`。 不指定`QoS`，由调用线程或队列来指定
+	- `inheritQoS`。 表明`DispatchWorkItem`会采用队列的`QoS class`，而不是当前的
+	- `enforceQoS`。 表明`DispatchWorkItem`会采用当前的`QoS class`，而不是队列的
 - **block: @escaping @convention(block) () -> Void** 任务
 
 #### 方法
@@ -121,7 +127,7 @@ group.notify(queue: DispatchQueue.main, work: item3)
 ### 2.3 线程锁
 有两种方法，分别是`DispatchSemaphore` 和任务对象`DispatchWorkItemFlag`的`Barrier`模式。
 #### DispatchSemaphore
-设定两个线程可用
+设定两个线程可用，不同队列
 
 ```swift
 let queue1 = DispatchQueue(label: "com.test1.queue")
@@ -160,7 +166,7 @@ queue3.async {
  */
 ```
 #### DispatchWorkItem
-文件读写
+文件读写，同一个队列
 
 ```swift
 let item1 = DispatchWorkItem {
