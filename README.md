@@ -1,29 +1,13 @@
-# 数据结构和算法
+# 整理
 
 ## 数据结构
-- [数组](Array.md)
-- [链表](LinkedList.md)
-- [栈](Stack.md)
-- [堆*](Heap.md)
-- [队列](Queue.md)
-	- [Swift实现循环队列](./Queue/CircularQueue.swift)
-- [树](Tree.md)
-- [散列表](HashTable.md)
-- 图
-- 集合
-- 多重集
-- 关联数组
+[详情](DataStruct/README.md)
 
 ## 算法
-
-### 常见算法
-- 搜索
-	- 二分查找 [LeetCode: 用“排除法”（减治思想）写二分查找问题、与其它二分查找模板的比较](https://leetcode-cn.com/problems/search-insert-position/solution/te-bie-hao-yong-de-er-fen-cha-fa-fa-mo-ban-python-/)
-- 排序
-- 分治法
-- 贪心算法
-- 动态规划
-- 单调栈
+[详情](Algorithm/README.md)
 
 ## ios相关
-- [GCD](./iOS/GCD.md)
+[详情](iOS/README.md)
+
+## 语言
+[详情](Language/README.md)
