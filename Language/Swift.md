@@ -1,5 +1,8 @@
 # Swift
-## 1 数据类型
+
+根据[中文版 Apple 官方 Swift 教程《The Swift Programming Language》](https://swiftgg.gitbook.io/swift/)整理。
+
+##1 数据类型
 ### 整数
 
 Swift 提供了8、16、32和64位的有符号和无符号整数类型。分别为 `Int8/Int16/Int32/Int64` 和 `UInt8/UInt16/UInt32/UInt64`。
@@ -58,7 +61,7 @@ let pi = 3.14159
 // pi 会被推测为 Double 类型
 ```
 
-## 2 控制流
+##2 控制流
 ### switch 
 在 Swift 里，`switch` 语句不会从上一个 `case` 分支跳转到下一个 `case` 分支中。相反，只要第一个匹配到的 `case` 分支完成了它需要执行的语句，整个 `switch` 代码块完成了它的执行。相比之下，C 语言要求你显式地插入 `break` 语句到每个 `case` 分支的末尾来阻止自动落入到下一个 `case` 分支中。Swift 的这种避免默认落入到下一个分支中的特性意味着它的 `switch` 功能要比 C 语言的更加清晰和可预测，可以避免无意识地执行多个 `case` 分支从而引发的错误。
 如果你确实需要 C 风格的贯穿的特性，你可以在每个需要该特性的 `case` 分支中使用 `fallthrough` 关键字。下面的例子使用 `fallthrough` 来创建一个数字的描述语句。
@@ -77,7 +80,7 @@ print(description)
 // 输出“The number 5 is a prime number, and also an integer.”
 ```
 
-## 3 函数
+##3 函数
 
 在 Swift 中，函数是一等公民，可以作为其他函数的参数。
 
@@ -102,7 +105,7 @@ arithmeticMean(3, 8.25, 18.75)
 ```
 >  一个函数最多只能拥有一个可变参数。
 
-## 4 枚举
+##4 枚举
 ### 枚举是一等公民
 它拥有很多类所支持的特性。
 
@@ -113,7 +116,7 @@ arithmeticMean(3, 8.25, 18.75)
 - 可遵循协议
 - 与 C 和 Objective-C 不同，Swift 的枚举成员在被创建时不会被赋予一个默认的整型值。
 
-## 5 类和结构体
+##5 类和结构体
 
 ### 类和结构体的区别
 - 继承允许一个类继承另一个类的特征
@@ -139,7 +142,7 @@ if tenEighty === alsoTenEighty {
 
 请注意，“相同”（用三个等号表示，`===`）与“等于”（用两个等号表示，`==`）的不同。“相同”表示两个类类型（class type）的常量或者变量引用同一个类实例。“等于”表示两个实例的值“相等”或“等价”，判定时要遵照设计者定义的评判标准。
 
-## 6 属性
+##6 属性
 
 ### 属性包装器
 
@@ -194,7 +197,7 @@ class SomeClass {
 
 > 注意闭包结尾的花括号后面接了一对空的小括号。这用来告诉 Swift 立即执行此闭包。如果你忽略了这对括号，相当于将闭包本身作为值赋值给了属性，而不是将闭包的返回值赋值给属性。
 
-## 7 下标
+##7 下标
 下标可以定义在类、结构体和枚举中，是访问集合、列表或序列中元素的快捷方式。可以使用下标的索引，设置和获取值，而不需要再调用对应的存取方法。举例来说，用下标访问一个 `Array` 实例中的元素可以写作 `someArray[index]`，访问 `Dictionary` 实例中的元素可以写作 `someDictionary[key]`。
 一个类型可以定义多个下标，通过不同索引类型进行对应的重载。下标不限于一维，你可以定义具有多个入参的下标满足自定s义类型的需求。
 ### 实例下标
@@ -248,7 +251,7 @@ print(mars)
 ```
 
 
-## 8 构造器
+##8 构造器
 ### 两段式构造过程
 
 Swift 中类的构造过程包含两个阶段。第一个阶段，类中的每个存储型属性赋一个初始值。当每个存储型属性的初始值被赋值后，第二阶段开始，它给每个类一次机会，在新实例准备使用之前进一步自定义它们的存储型属性。
@@ -382,9 +385,465 @@ class SomeClass {
 }
 ```
 
+##9 错误处理
 
+在 Swift 中，错误用遵循 Error 协议的类型的值来表示。这个空协议表明该类型可以用于错误处理。
 
+Swift 的枚举类型尤为适合构建一组相关的错误状态，枚举的关联值还可以提供错误状态的额外信息。例如，在游戏中操作自动贩卖机时，你可以这样表示可能会出现的错误状态：
 
+```swift
+enum VendingMachineError: Error {
+    case invalidSelection                     //选择无效
+    case insufficientFunds(coinsNeeded: Int) //金额不足
+    case outOfStock                             //缺货
+}
+```
 
+### 用 throwing 函数传递错误
 
+为了表示一个函数、方法或构造器可以抛出错误，在函数声明的参数之后加上 throws 关键字。一个标有 throws 关键字的函数被称作 throwing 函数。如果这个函数指明了返回值类型，throws 关键词需要写在返回箭头（->）的前面。
 
+```swift
+func canThrowErrors() throws -> String
+
+func cannotThrowErrors() -> String
+```
+
+### 用 Do-Catch 处理错误
+
+你可以使用一个 do-catch 语句运行一段闭包代码来处理错误。如果在 `do` 子句中的代码抛出了一个错误，这个错误会与 `catch` 子句做匹配，从而决定哪条子句能处理它。
+
+```swift
+var vendingMachine = VendingMachine()
+vendingMachine.coinsDeposited = 8
+do {
+    try buyFavoriteSnack(person: "Alice", vendingMachine: vendingMachine)
+    print("Success! Yum.")
+} catch VendingMachineError.invalidSelection {
+    print("Invalid Selection.")
+} catch VendingMachineError.outOfStock {
+    print("Out of Stock.")
+} catch VendingMachineError.insufficientFunds(let coinsNeeded) {
+    print("Insufficient funds. Please insert an additional \(coinsNeeded) coins.")
+} catch {
+    print("Unexpected error: \(error).")
+}
+// 打印“Insufficient funds. Please insert an additional 2 coins.”
+```
+
+### 将错误转换成可选值
+
+可以使用 `try?` 通过将错误转换成一个可选值来处理错误。如果是在计算 `try?` 表达式时抛出错误，该表达式的结果就为 `nil`。例如，在下面的代码中，`x` 和 `y` 有着相同的数值和等价的含义：
+
+```swift
+func someThrowingFunction() throws -> Int {
+    // ...
+}
+
+let x = try? someThrowingFunction()
+
+let y: Int?
+do {
+    y = try someThrowingFunction()
+} catch {
+    y = nil
+}
+```
+
+### 禁用错误传递
+
+有时你知道某个 throwing 函数实际上在运行时是不会抛出错误的，在这种情况下，你可以在表达式前面写 `try!` 来禁用错误传递，这会把调用包装在一个不会有错误抛出的运行时断言中。如果真的抛出了错误，你会得到一个运行时错误。
+
+```swift
+let photo = try! loadImage(atPath: "./Resources/John Appleseed.jpg")
+```
+
+##10 扩展
+
+扩展可以给一个现有的类，结构体，枚举，还有协议添加新的功能。它还拥有不需要访问被扩展类型源代码就能完成扩展的能力（即逆向建模）。扩展和 Objective-C 的分类很相似。（与 Objective-C 分类不同的是，Swift 扩展是没有名字的。）
+
+Swift 中的扩展可以：
+
+- 添加计算型实例属性和计算型类属性
+- 定义实例方法和类方法
+- 提供新的构造器
+- 定义下标
+- 定义和使用新的嵌套类型
+- 使已经存在的类型遵循（conform）一个协议
+
+> 扩展可以给一个类型添加新的功能，但是不能重写已经存在的功能。
+
+## 11 协议
+
+### 属性要求
+
+协议可以要求遵循协议的类型提供特定名称和类型的实例属性或类型属性。协议不指定属性是存储属性还是计算属性，它只指定属性的名称和类型。此外，协议还指定属性是可读的还是可读可写的。
+
+```swift
+protocol SomeProtocol {
+    var mustBeSettable: Int { get set }
+    var doesNotNeedToBeSettable: Int { get }
+}
+```
+
+### 方法要求
+
+协议可以要求遵循协议的类型实现某些指定的实例方法或类方法。这些方法作为协议的一部分，像普通方法一样放在协议的定义中，但是不需要大括号和方法体。可以在协议中定义具有可变参数的方法，和普通方法的定义方式相同。但是，不支持为协议中的方法提供默认参数。
+
+```swift
+protocol SomeProtocol {
+    static func someTypeMethod()
+}
+
+protocol RandomNumberGenerator {
+    func random() -> Double
+}
+```
+
+### 异变方法要求
+
+有时需要在方法中改变（或异变）方法所属的实例。例如，在值类型（即结构体和枚举）的实例方法中，将 `mutating` 关键字作为方法的前缀，写在 `func` 关键字之前，表示可以在该方法中修改它所属的实例以及实例的任意属性的值。
+
+如果你在协议中定义了一个实例方法，该方法会改变遵循该协议的类型的实例，那么在定义协议时需要在方法前加 mutating 关键字。这使得结构体和枚举能够遵循此协议并满足此方法要求。
+
+```swift
+protocol Togglable {
+    mutating func toggle()
+}
+enum OnOffSwitch: Togglable {
+    case off, on
+    mutating func toggle() {
+        switch self {
+        case .off:
+            self = .on
+        case .on:
+            self = .off
+        }
+    }
+}
+var lightSwitch = OnOffSwitch.off
+lightSwitch.toggle()
+// lightSwitch 现在的值为 .on
+```
+
+> 实现协议中的 `mutating` 方法时，若是类类型，则不用写 `mutating` 关键字。而对于结构体和枚举，则必须写 `mutating` 关键字。
+
+### 构造器要求
+
+协议可以要求遵循协议的类型实现指定的构造器。你可以像编写普通构造器那样，在协议的定义里写下构造器的声明，但不需要写花括号和构造器的实体：
+
+```swift
+protocol SomeProtocol {
+    init(someParameter: Int)
+}
+```
+
+你可以在遵循协议的类中实现构造器，无论是作为指定构造器，还是作为便利构造器。无论哪种情况，你都必须为构造器实现标上 required 修饰符：
+
+```swift
+class SomeClass: SomeProtocol {
+    required init(someParameter: Int) {
+        // 这里是构造器的实现部分
+    }
+}
+```
+
+> 如果类已经被标记为 final，那么不需要在协议构造器的实现中使用 required 修饰符，因为 final 类不能有子类。
+
+### 类专属的协议
+
+你通过添加 AnyObject 关键字到协议的继承列表，就可以限制协议只能被类类型采纳（以及非结构体或者非枚举的类型）。
+
+```swift
+protocol SomeClassOnlyProtocol: AnyObject, SomeInheritedProtocol {
+    // 这里是类专属协议的定义部分
+}
+```
+
+### 可选的协议要求
+
+协议可以定义可选要求，遵循协议的类型可以选择是否实现这些要求。在协议中使用 `optional` 关键字作为前缀来定义可选要求。
+
+这个特性只能用在你需要和 Objective-C 打交道的代码中。协议和可选要求都必须带上 `@objc` 属性。标记 `@objc` 特性的协议只能被继承自 Objective-C 类的类或者 `@objc` 类遵循，其他类以及结构体和枚举均不能遵循这种协议。
+
+```swift
+@objc protocol CounterDataSource {
+    @objc optional func increment(forCount count: Int) -> Int
+    @objc optional var fixedIncrement: Int { get }
+}
+```
+
+### 提供默认实现
+
+可以通过协议扩展来为协议要求的方法、计算属性提供默认的实现。如果遵循协议的类型为这些要求提供了自己的实现，那么这些自定义实现将会替代扩展中的默认实现被使用。
+
+```swift
+extension PrettyTextRepresentable  {
+    var prettyTextualDescription: String {
+        return textualDescription
+    }
+}
+```
+
+### 为协议扩展添加限制条件
+
+在扩展协议的时候，可以指定一些限制条件，只有遵循协议的类型满足这些限制条件时，才能获得协议扩展提供的默认实现。这些限制条件写在协议名之后，使用 where 子句来描述。
+
+```swift
+extension Collection where Element: Equatable {
+    func allEqual() -> Bool {
+        for element in self {
+            if element != self.first {
+                return false
+            }
+        }
+        return true
+    }
+}
+```
+
+##12 泛型
+
+泛型代码让你能根据自定义的需求，编写出适用于任意类型的、灵活可复用的函数及类型。你可避免编写重复的代码，而是用一种清晰抽象的方式来表达代码的意图。
+
+### 泛型函数
+
+泛型函数可适用于任意类型，下面是函数 `swapTwoInts(_:_:)` 的泛型版本，命名为 `swapTwoValues(_:_:)`：
+
+```swift
+func swapTwoValues<T>(_ a: inout T, _ b: inout T) {
+    let temporaryA = a
+    a = b
+    b = temporaryA
+}
+```
+
+### 关联类型
+
+定义一个协议时，声明一个或多个关联类型作为协议定义的一部分将会非常有用。关联类型为协议中的某个类型提供了一个占位符名称，其代表的实际类型在协议被遵循时才会被指定。关联类型通过 `associatedtype` 关键字来指定。
+
+```swift
+protocol Container {
+    associatedtype Item
+    mutating func append(_ item: Item)
+    var count: Int { get }
+    subscript(i: Int) -> Item { get }
+}
+
+struct IntStack: Container {
+    // IntStack 的原始实现部分
+    var items = [Int]()
+    mutating func push(_ item: Int) {
+        items.append(item)
+    }
+    mutating func pop() -> Int {
+        return items.removeLast()
+    }
+    // Container 协议的实现部分
+    typealias Item = Int
+    mutating func append(_ item: Int) {
+        self.push(item)
+    }
+    var count: Int {
+        return items.count
+    }
+    subscript(i: Int) -> Int {
+        return items[i]
+    }
+}
+```
+
+### 泛型 where 语句
+
+对关联类型添加约束通常是非常有用的。你可以通过定义一个泛型 where 子句来实现。通过泛型 where 子句让关联类型遵从某个特定的协议，以及某个特定的类型参数和关联类型必须类型相同。你可以通过将 where 关键字紧跟在类型参数列表后面来定义 where 子句，where 子句后跟一个或者多个针对关联类型的约束，以及一个或多个类型参数和关联类型间的相等关系。你可以在函数体或者类型的大括号之前添加 where 子句。
+
+```swift
+func allItemsMatch<C1: Container, C2: Container>
+    (_ someContainer: C1, _ anotherContainer: C2) -> Bool
+    where C1.Item == C2.Item, C1.Item: Equatable {
+
+        // 检查两个容器含有相同数量的元素
+        if someContainer.count != anotherContainer.count {
+            return false
+        }
+
+        // 检查每一对元素是否相等
+        for i in 0..<someContainer.count {
+            if someContainer[i] != anotherContainer[i] {
+                return false
+            }
+        }
+
+        // 所有元素都匹配，返回 true
+        return true
+}
+```
+
+这个函数的类型参数列表还定义了对两个类型参数的要求：
+
+- `C1` 必须符合 `Container` 协议（写作 `C1: Container`）。
+- `C2` 必须符合 `Container` 协议（写作 `C2: Container`）。
+- `C1` 的 `Item` 必须和 `C2` 的 `Item` 类型相同（写作 `C1.Item == C2.Item`）。
+- `C1` 的 `Item` 必须符合 `Equatable` 协议（写作 `C1.Item: Equatable`）。
+
+### 具有泛型 Where 子句的关联类型
+
+你可以在关联类型后面加上具有泛型 `where` 的字句。例如，建立一个包含迭代器（`Iterator`）的容器，就像是标准库中使用的 `Sequence` 协议那样。你应该这么写：
+
+```swift
+protocol Container {
+    associatedtype Item
+    mutating func append(_ item: Item)
+    var count: Int { get }
+    subscript(i: Int) -> Item { get }
+
+    associatedtype Iterator: IteratorProtocol where Iterator.Element == Item
+    func makeIterator() -> Iterator
+}
+
+protocol ComparableContainer: Container where Item: Comparable { }
+```
+##13 不透明类型
+
+TODO
+
+## 14 ARC
+
+每当你创建一个新的类实例时，ARC 会分配一块内存来储存该实例的信息。内存中会包含实例的类型信息，以及这个实例所关联的任何存储属性的值。
+
+此外，当实例不再被使用时，ARC 释放实例所占用的内存，并让释放的内存能挪作他用。这确保了不再被使用的实例，不会一直占用内存空间。
+
+然而，当 ARC 回收并释放了正在被使用中的实例后，该实例的属性和方法将不能再被访问和调用。实际上，如果你试图访问这个实例，你的应用程序很可能会崩溃。
+
+为了确保使用中的实例不会被销毁，ARC 会跟踪和计算每一个实例正在被多少属性，常量和变量所引用。哪怕实例的引用数为 1，ARC 都不会销毁这个实例。
+
+为了使上述成为可能，无论你将实例赋值给属性、常量或变量，它们都会创建此实例的强引用。之所以称之为“强”引用，是因为它会将实例牢牢地保持住，只要强引用还在，实例是不允许被销毁的。
+
+### 类实例之间的循环强引用
+循环强引用会导致实例不再被需要时ARC不会自动销毁对象。因为他们的引用计数并没有标记为0。
+
+例如公寓和人之间发生了循环强引用：
+
+```swift
+class Person {
+    let name: String
+    init(name: String) { self.name = name }
+    var apartment: Apartment?
+    deinit { print("\(name) is being deinitialized") }
+}
+
+class Apartment {
+    let unit: String
+    init(unit: String) { self.unit = unit }
+    var tenant: Person?
+    deinit { print("Apartment \(unit) is being deinitialized") }
+}
+
+// 定义变量
+var john: Person?
+var unit4A: Apartment?
+
+// 实例化
+john = Person(name: "John Appleseed")
+unit4A = Apartment(unit: "4A")
+
+// 此时两个实例之间发生循环强引用
+john!.apartment = unit4A
+unit4A!.tenant = john
+
+// 即使将他们都赋值为nil，他们的析构器也不会被调用
+john = nil
+unit4A = nil
+```
+
+Swift 提供了两种办法用来解决你在使用类的属性时所遇到的循环强引用问题：弱引用（weak reference）和无主引用（unowned reference）。
+
+#### 使用场景
+
+**场景一：**
+
+两个实例中**两个属性的值都允许为 `nil`**，在生命周期较长的实例的属性中使用弱引用。
+
+公寓和居民的关系，如下：
+
+```swift
+class Person {
+    let name: String
+    init(name: String) { self.name = name }
+    var apartment: Apartment?
+    deinit { print("\(name) is being deinitialized") }
+}
+
+class Apartment {
+    let unit: String
+    init(unit: String) { self.unit = unit }
+    weak var tenant: Person?
+    deinit { print("Apartment \(unit) is being deinitialized") }
+}
+```
+
+**场景二：**
+
+两个实例中**一个属性的值允许为 `nil`，而另一个属性的值不允许为 `nil`**，在生命周期较短的实例的属性中使用无主引用。
+
+信用卡和客户的关系：
+
+```swift
+class Customer {
+    let name: String
+    var card: CreditCard?
+    init(name: String) {
+        self.name = name
+    }
+    deinit { print("\(name) is being deinitialized") }
+}
+
+class CreditCard {
+    let number: UInt64
+    unowned let customer: Customer
+    init(number: UInt64, customer: Customer) {
+        self.number = number
+        self.customer = customer
+    }
+    deinit { print("Card #\(number) is being deinitialized") }
+}
+```
+
+**场景三：**
+
+初始化完成之后，两个实例的**相应的属性都不允许为 `nil`**，需要一个类使用无主属性，而另外一个类使用隐式解包可选值属性。
+
+国家和城市的关系：
+
+```swift
+class Country {
+    let name: String
+    var capitalCity: City!
+    init(name: String, capitalName: String) {
+        self.name = name
+        self.capitalCity = City(name: capitalName, country: self)
+    }
+}
+
+class City {
+    let name: String
+    unowned let country: Country
+    init(name: String, country: Country) {
+        self.name = name
+        self.country = country
+    }
+}
+```
+
+在这种情况下，你可以通过一条语句同时创建 Country 和 City 的实例，而不产生循环强引用，并且 capitalCity 的属性能被直接访问，而不需要通过感叹号来展开它的可选值：
+
+```swift
+var country = Country(name: "Canada", capitalName: "Ottawa")
+```
+
+>-  在使用垃圾收集的系统里，弱指针有时用来实现简单的缓冲机制，因为没有强引用的对象只会在内存压力触发垃圾收集时才被销毁。但是在 ARC 中，一旦值的最后一个强引用被移除，就会被立即销毁，这导致弱引用并不适合上面的用途。
+> 
+> - 使用无主引用，你必须确保引用始终指向一个未销毁的实例。
+如果你试图在实例被销毁后，访问该实例的无主引用，会触发运行时错误。
+
+### 闭包的循环强引用
