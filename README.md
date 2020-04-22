@@ -7,7 +7,12 @@
 [详情](Algorithm/README.md)
 
 ## ios相关
-[详情](iOS/README.md)
+- [GCD](iOS/GCD.md)
 
 ## 语言
-[详情](Language/README.md)
+- [Swift](Language/Swift.md)
+
+## Tools
+- [字符串扩展](Tools/StringExtension.swift)
+	- 获取指定类型的字符串
+- [验证码产生器](Tools/CaptchaView.swift)

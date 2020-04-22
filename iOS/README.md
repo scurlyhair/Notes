@@ -1,3 +1,0 @@
-# iOS
-
-- [GCD](GCD.md)
