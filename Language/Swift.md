@@ -205,7 +205,7 @@ class SomeClass {
 ### 7.1 实例下标
 `subscript(index: Int) -> Int`
 
-```
+```swift
 struct TimesTable {
     let multiplier: Int
     subscript(index: Int) -> Int {
@@ -848,4 +848,53 @@ var country = Country(name: "Canada", capitalName: "Ottawa")
 > - 使用无主引用，你必须确保引用始终指向一个未销毁的实例。
 如果你试图在实例被销毁后，访问该实例的无主引用，会触发运行时错误。
 
-### 14.3 闭包的循环强引用
+### 14.2 闭包的循环强引用
+
+在定义闭包时同时定义捕获列表作为闭包的一部分，通过这种方式可以解决闭包和类实例之间的循环强引用。
+
+#### 14.2.1 定义捕获列表
+
+捕获列表中的每一项都由一对元素组成，一个元素是 `weak` 或 `unowned` 关键字，另一个元素是类实例的引用（例如 `self`）或初始化过的变量（如 `delegate = self.delegate`）。这些项在方括号中用逗号分开。
+如果闭包有参数列表和返回类型，把捕获列表放在它们前面：
+
+```swift
+lazy var someClosure = {
+    [unowned self, weak delegate = self.delegate]
+    (index: Int, stringToProcess: String) -> String in
+    // 这里是闭包的函数体
+}
+```
+
+#### 14.2.2 弱引用和无主引用
+
+- 在闭包和捕获的实例总是**互相引用并且总是同时销毁时**，将闭包内的捕获定义为**无主引用**。
+
+```swift
+class HTMLElement {
+
+    let name: String
+    let text: String?
+
+    lazy var asHTML: () -> String = {
+        [unowned self] in
+        if let text = self.text {
+            return "<\(self.name)>\(text)</\(self.name)>"
+        } else {
+            return "<\(self.name) />"
+        }
+    }
+
+    init(name: String, text: String? = nil) {
+        self.name = name
+        self.text = text
+    }
+
+    deinit {
+        print("\(name) is being deinitialized")
+    }
+
+}
+```
+
+- 在被捕获的引用可能会变为 `nil` 时，将闭包内的捕获定义为**弱引用**。
+
