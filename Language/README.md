@@ -1,5 +1,15 @@
 # 语言
 
+## swift
+[详情](Swift.md)
+
+
+
+
+
+
+
+
 `swift` 对比 `oc` 
 
 - 语法
@@ -20,26 +30,26 @@
 	- 闭包。 类似于 `oc` 中的` blocks` 或者其他编程语言中的匿名函数 `Lambdas`。
 
 	
-### 枚举是一等公民
-它拥有很多类所支持的特性。
 
-- 计算属性
-- 实例方法
-- 构造函数
-- 可扩展
-- 可遵循协议
-- 与 C 和 Objective-C 不同，Swift 的枚举成员在被创建时不会被赋予一个默认的整型值。
 
-	
-### String.Index 
-由于swift 的 String 类型是基于 Unicode 标量建立的。而每一个Unicode标量占用的内存空间不确定，所以不能使用Int 来作为索引。
 
-### 结构体和类对比
-[类和结构体](https://swiftgg.gitbook.io/swift/swift-jiao-cheng/09_structures_and_classes)
 
-- 类可以继承其他类
-- 类的实例可以在运行时进行检查和解析其类型
-- 属于引用类型
+### 下标
+- 实例下标
+`subscript(index: Int) -> Int`
+
+```
+struct TimesTable {
+    let multiplier: Int
+    subscript(index: Int) -> Int {
+        return multiplier * index
+    }
+}
+let threeTimesTable = TimesTable(multiplier: 3)
+print("six times three is \(threeTimesTable[6])")
+```
+- 类型下标
+`static subscript(index: Int) -> Int`
 
 
 ## 比较
