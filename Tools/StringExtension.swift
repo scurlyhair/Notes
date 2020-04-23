@@ -1,20 +1,20 @@
 
 extension String {
-    // 获取 a~z 小写英文字母集合
+    /// 获取 a~z 小写英文字母集合
     static func getLowercaseLetters() -> [String] {
         let aScalars = "a".unicodeScalars
         let aCode = aScalars[aScalars.startIndex].value
         let letters: [String] = (0..<26).map { String(UnicodeScalar(aCode + $0)!) }
         return letters
     }
-    // 获取 A~Z 大写英文字母集合
+    /// 获取 A~Z 大写英文字母集合
     static func getCapitalLetters() -> [String] {
         let aScalars = "A".unicodeScalars
         let aCode = aScalars[aScalars.startIndex].value
         let letters: [String] = (0..<26).map { String(UnicodeScalar(aCode + $0)!) }
         return letters
     }
-    // 获取 0~9 数字集合
+    /// 获取 0~9 数字集合
     static func getNumbers() -> [String] {
         let zeroScalars = "0".unicodeScalars
         let zeroCode = zeroScalars[zeroScalars.startIndex].value
@@ -22,7 +22,7 @@ extension String {
         return numbers
     }
     
-    /// 根据颜色编码生成 UIColor 实例
+    /// 从颜色编码产生 UIColor 实例，支持 hex/rgba/argb/rgb
     func generateUIColor() -> UIColor {
         let leftParenCharset: CharacterSet = CharacterSet(charactersIn: "( ")
         let commaCharset: CharacterSet = CharacterSet(charactersIn: ", ")

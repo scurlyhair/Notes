@@ -3,22 +3,22 @@ import UIKit
 // 验证码生成器
 class CaptchaView: UIView {
     /// 验证是否正确
-    public func checkCorrect(withInput text: String?) -> Bool {
+    func checkCorrect(withInput text: String?) -> Bool {
         return code == text?.capitalized
     }
     
     // 验证码位数
-    public var authCodeLength = 4
+    var authCodeLength = 4
     // 验证码字体
-    public var codeFont = UIFont.systemFont(ofSize: 40)
+    var codeFont = UIFont.systemFont(ofSize: 40)
     // 验证码颜色
-    public var codeColor: UIColor = .yellow
+    var codeColor: UIColor = .yellow
     // 干扰线颜色
-    public var lineColor: UIColor = .lightGray
+    var lineColor: UIColor = .lightGray
     // 干扰线宽度
-    public var lineWidth: CGFloat = 3.0
+    var lineWidth: CGFloat = 3.0
     // 干扰线条数
-    public var lineAmount: Int = 8
+    var lineAmount: Int = 8
     
     // 正确的验证码
     private var code: String?
@@ -96,7 +96,7 @@ class CaptchaView: UIView {
     }
 }
 
-extension String {
+fileprivate extension String {
     // 获取 A~Z 大写英文字母集合
     static func getCapitalLetters() -> [String] {
         let aScalars = "A".unicodeScalars
