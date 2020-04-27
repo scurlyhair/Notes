@@ -10,6 +10,7 @@
 ## iOSSDK
 - [GCD](IOS/GCD.md)
 - [RunLoop](IOS/Runloop.md)
+- [文件管理](IOS/FileManager.md)
 
 ## 语言
 - [Swift](Language/Swift.md)
