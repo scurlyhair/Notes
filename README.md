@@ -1,6 +1,10 @@
 # 归档
 对已知知识点进行整理和归档，构建知识框架。
 
+## 计算机基础
+
+[编码](Basics/Encoding.md)
+
 ## 数据结构
 [待整理](DataStruct/README.md)
 
@@ -20,3 +24,7 @@
 	- 获取指定类型的字符串
 	- 根据颜色编码产生 `UIColor` 实例
 - [验证码产生器](Tools/CaptchaView.swift)
+
+
+## 解决方案
+- [WebView性能优化](Solutions/WebOptimizing.md)

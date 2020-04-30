@@ -52,7 +52,7 @@ let result = fm.createFile(atPath: filePath, contents: data, attributes: nil)
 
 ```swift
 do {
-	let contents = try fm.contentsOfDirectory(atPath: tmpDir.path)
+	let contents = try fm.contentsOfDirectory(atPath: tmpDir.path) // 注意这里要用.path 
 } catch let err {
 	print("Error: " + err.localizedDescription)
 }
