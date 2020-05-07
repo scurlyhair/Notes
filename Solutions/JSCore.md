@@ -8,7 +8,7 @@ WebKit 是 Safari 浏览器的内核。由苹果公司开源，Chrome 浏览器�
 
 其架构如下图:
 
-![WebKit组成](JSCore_04.png)
+![JSCore_01](JSCore_01.png)
 
 从图中可以看到，WebKit 就是一个页面渲染以及逻辑处理的引擎。他把接收到的 HTML、JavaScript、CSS 渲染成浏览器页面，并为用户的交互提供支撑。
 
@@ -29,7 +29,7 @@ JavaScriptCore 是 WebKit 中的重要组成模块。主要负责 JS 脚本的�
 - DFG 低延迟优化的JIT
 - FTL 高通量优化的JIT
 
-![JavaScriptCore组成部分](JSCore_01.png)
+![JSCore_02](JSCore_02.png)
 
 ### 1.3 JavaScriptCore 框架
 
@@ -48,7 +48,7 @@ JSContext 是 JS 的执行环境。
 - 获取 JavaScript脚本 中的 对象和值
 - 将原生代码中的对象/方法/函数 注册到 JavaScript 执行环境中
 
-![JSContext](JSCore_02.png)
+![JSCore_03](JSCore_03.png)
 
 ```swift
 // 初始化一个 JSContext
@@ -93,23 +93,6 @@ open var virtualMachine: JSVirtualMachine! { get }
 // 上下文名字，适用于远程调试
 @available(iOS 8.0, *)
 open var name: String!
-```
-应用:
-
-```swift
-// 设置异常处理
-let context = JSContext()
-context?.exceptionHandler = { c, v in
-	print("出错了。。。。")
-}
-
-// 设置一个数组
-let jsVal = context?.evaluateScript("var a = [1, 2, 3]")
-//根据名字取出对象
-if let v = context?.objectForKeyedSubscript("a") {
-	// 可以根据下标取值
-	print("a=", v.atIndex(0))
-}
 ```
 
 ### 1.2 JSValue
@@ -298,7 +281,7 @@ func webViewDidFinishLoad(_ webView: UIWebView) {
 > 
 > 当初始化一个 未指定JSVirtualMachine 的 JSContext 时，系统会自动创建一个 JSVirtualMachine 并分配给它。
 
-![JSVirtualMachine](JSCore_03.png)
+![JSCore_04](JSCore_04.png)
 
 并发案例：
 
