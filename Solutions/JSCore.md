@@ -39,7 +39,7 @@ JavaScriptCore 是 WebKit 中的重要组成模块。主要负责 JS 脚本的�
 
 JSContext，JSValue，JSManagedValue，JSExport， JSVirtualMachine
 
-### 1.1 JSContext
+### 2.1 JSContext
 
 JSContext 是 JS 的执行环境。
 它提供了以下功能：
@@ -95,7 +95,7 @@ open var virtualMachine: JSVirtualMachine! { get }
 open var name: String!
 ```
 
-### 1.2 JSValue
+### 2.2 JSValue
 
 一个 JSValue 实例就是 JSContext 中一个  JS 对象的**引用**（或者叫做指针）。使用它可以完成 JS 和 OC/Swift 间类型的转换，对应关系如 Table1：
 
@@ -171,7 +171,7 @@ open func construct(withArguments arguments: [Any]!) -> JSValue!
 open func invokeMethod(_ method: String!, withArguments arguments: [Any]!) -> JSValue!
 ```
 
-### 1.3 JSExport
+### 2.3 JSExport
 
 JSExport 是一个协议，通过实现它可以把一个 Native 对象暴漏给js。
 
@@ -267,7 +267,7 @@ func webViewDidFinishLoad(_ webView: UIWebView) {
 </script>
 ```
 
-### 1.4 JSVirtualMachine
+### 2.4 JSVirtualMachine
 
 一个 JSVirtualMachine 实例就是一个完整独立的 JS 执行环境，并为其提供所需要的底层执行资源。JavaScriptCore API 是线程安全的（例如，我们可以从任何线程创建 JSValue 对象或运行 JS 脚本） 但是，尝试使用相同 JSVirtualMachine 的所有其他线程将被阻塞。 要在多个线程上同时（并发）运行 JavaScript 脚本，需要为每个线程使用单独的 JSVirtualMachine 实例。
 
@@ -283,7 +283,7 @@ func webViewDidFinishLoad(_ webView: UIWebView) {
 
 ![JSCore_04](JSCore_04.png)
 
-并发案例：
+案例一：
 
 ```swift
 /*
@@ -329,26 +329,34 @@ DispatchQueue(label: "queue3").async {
 }
 ```
 
-### 1.5 JSManagedValue
+### 2.5 JSManagedValue
 
-JSValue的封装，用以解决 JavaScript 和 Native 对象之间循环引用的问题。
-可以让引用技术和垃圾回收这两种内存管理机制进行正确的转换。
+JSVirtualMachine 使用垃圾回收策略，而 Native 使用引用计数来管理内存。JSManagedValue 就是用来保证这两种机制稳健运行。
 
-其主要应用场景是：
-在 导出为JS对象的 Native 对象中 储存 JavaScript 对象的值。
+每个JSValue对象都持有其JSContext对象的强引用，只要有任何一个与特定JSContext关联的JSValue被持有（retain），这个JSContext就会一直存活。如果我们将一个native对象导出给JavaScript，即将这个对象交由JavaScript的全局对象持有
+，引用关系是这样的：
 
-```swift
-// 初始化
-public /*not inherited*/ init!(value: JSValue!, andOwner owner: Any!)
-public init!(value: JSValue!)
+![JSCore_05](JSCore_05.png)
 
-// 获取 JSManagedValue 对应的 JSValue
-open var value: JSValue! { get }
-```
+这时如果我们在native对象中强引用持有JSContext或者JSValue，便会造成循环引用：
 
-## 2 应用场景
+![JSCore_06](JSCore_06.png)
 
-### 2.1 Native 调用 JS
+使用 JSManagedValue 的对象需要符合以下两个条件：
+
+- The JSManagedValue's JavaScript value is reachable from JavaScript.
+- The owner of the managed reference is reachable in Objective-C. Manually adding or removing the managed reference in the JSVirtualMachine determines reachability.
+
+即：JSManagedValue 帮助我们保存JSValue，那里面保存的JS对象必须在JS中存在，同时 JSManagedValue 的owner在OC中也存在。
+
+当把一个JavaScript值保存到一个本地实例变量上时，需要尤其注意内存管理陷阱。 用实例变量保存一个JSValue非常容易引起循环引用。
+
+
+**TODO： 案例**
+
+## 3 应用场景
+
+### 3.1 Native 调用 JS
 
 ```swift
 let context = JSContext()
@@ -367,9 +375,9 @@ let jsAddFunc = context?.objectForKeyedSubscript("add")
 let sum = jsAddFunc?.call(withArguments: [1, 2])?.toInt32()
 ```
 
-### 2.2 JS 调用 Native
+### 3.2 JS 调用 Native
 
-#### 2.2.1 方案一： 将 block 闭包注册到 context
+#### 3.2.1 方案一： 将 block 闭包注册到 context
 
 案例一： 计算和
 
@@ -435,46 +443,60 @@ context?.evaluateScript("console.log('hello world')")
 > person.doAction(action: saySomething_swift, arg: "helloworld")
 > ```
 
-#### 2.2.2 方案二： 实现 JSExport 协议
+#### 3.2.2 方案二： 实现 JSExport 协议
 
-详见：**## 1.3 JSExport**  小节
+详见：**## 2.3 JSExport**  小节
 
-## 3 内存管理
+## 4 内存管理
 
-### 3.1 循环引用
+### 4.1 Block 循环引用
 
-不要在 block 里面直接使用 context，或者使用外部的 JSValue 对象
+#### 4.1.1 避免直接使用外部 context
 
 ```swift
-// 案例一：循环引用，内存泄漏
-let context = JSContext()
-
+// 错误用法
 let function1: @convention(block) ()->Void = {
     context?.evaluateScript("someFunction()")
 }
 context?.setObject(function1, forKeyedSubscript: "function" as NSCopying & NSObjectProtocol)
 
-// 案例二：循环引用，内存泄漏
-let jsValue = JSValue(int32: 0, in: context)
-
+// 正确用法
 let function2: @convention(block) ()->Void = {
-    let _ = jsValue?.toInt32()
+    JSContext.current().evaluateScript("someFunction()")
 }
 context?.setObject(function2, forKeyedSubscript: "function" as NSCopying & NSObjectProtocol)
 ```
 
-正确的方法是在 block 中使用 js 传回的参数
+#### 4.1.2 避免直接使用外部的 JSValue 对象
 
 ```swift
-let function3: @convention(block) (String) -> Void = { message in
-    print(message)
+// 错误用法
+let value = JSValue(int32: 9527, in: context)
+let function1: @convention(block) ()->Void = {
+    print(value?.toInt32() ?? 0)
 }
-context?.setObject(function3, forKeyedSubscript: "function" as NSCopying & NSObjectProtocol)
+context?.setObject(function1, forKeyedSubscript: "function" as NSCopying & NSObjectProtocol)
+
+// 正确用法
+let value = JSValue(int32: 9527, in: context)
+let managedValue = JSManagedValue(value: value)
+let function2: @convention(block) ()->Void = {
+    print(managedValue?.value.toInt32() ?? 0)
+}
+context?.setObject(function2, forKeyedSubscript: "function" as NSCopying & NSObjectProtocol)
 ```
+
+### 4.2 实例循环引用
+
+详见 **## 2.5 JSManagedValue** 小节
+
+
+
 
 参考链接：
 
-- [JavaScriptCore全面解析](https://segmentfault.com/a/1190000017983911)
+- [JavaScriptCore全面解析（上篇）](https://cloud.tencent.com/developer/article/1004875)
+- [JavaScriptCore全面解析（下篇）](https://cloud.tencent.com/developer/article/1004876)
 - [JSCore的基本使用](https://mp.weixin.qq.com/s/7pUB5w0Ivm1yE7KjW2lJiA)
 - [深入理解 JSCore](https://www.infoq.cn/article/mXQPTwpqQP7bB0PAN2CF)
 - [iOS 中的 JS](https://zhuanlan.zhihu.com/p/34646281)
