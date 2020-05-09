@@ -19,16 +19,16 @@
 ## 语言
 - [Swift](Language/Swift.md)
 
-## 工具库
-- [字符串扩展](Tools/StringExtension.swift)
-	- 获取指定类型的字符串
-	- 根据颜色编码产生 `UIColor` 实例
-- [验证码产生器](Tools/CaptchaView.swift)
-
 
 ## 解决方案
 
 - Web
 	- [WKWebView中JavaScript跟Native通信](Solutions/JSInteraction.md)
 	- [JavaScriptCore框架分析及应用](Solutions/JSCore.md)
-	- [WebView性能优化](Solutions/WebOptimizing.md)
+	- [Web资源本地化](Solutions/WebLocalized.md)
+
+## 工具库
+- [字符串扩展](Tools/StringExtension.swift)
+	- 获取指定类型的字符串
+	- 根据颜色编码产生 `UIColor` 实例
+- [验证码产生器](Tools/CaptchaView.swift)
