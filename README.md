@@ -4,6 +4,7 @@
 ## 计算机基础
 
 - [编码](Basics/Encoding.md)
+- [正则表达式学习](https://www.jb51.net/tools/zhengze.html)
 
 ## Web
 
@@ -14,7 +15,8 @@
 ### SDK
 
 - [GCD](IOS/GCD.md)
-- [RunLoop](IOS/Runloop.md)
+- [Runloop](IOS/Runloop.md) 待完善
+- [Runtime](IOS/Runtime.md)
 - [文件管理](IOS/FileManager.md)
 - [JavaScriptCore框架分析及应用](IOS/JSCore.md)
 - [WKWebView中JavaScript跟Native通信](IOS/JSInteraction.md)
