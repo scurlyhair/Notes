@@ -232,6 +232,8 @@ func class_addProtocol(_ cls: AnyClass?, _ protocol: Protocol) -> Bool
 ```swift
 // 修改类的版本
 func class_setVersion(_ cls: AnyClass?, _ version: Int32)
+// 替换方法
+func class_replaceMethod(_ cls: AnyClass?, _ name: Selector, _ imp: IMP, _ types: UnsafePointer<Int8>?) -> IMP?
 ```
 
 ### 2.3 方法的操作
@@ -260,7 +262,7 @@ func method_copyReturnType(_ m: Method) -> UnsafeMutablePointer<Int8>
 // 交换两个方法的实现
 func method_exchangeImplementations(_ m1: Method, _ m2: Method)
 ```
-```OC
+```Object-C
 // This is an atomic version of the following:
 IMP imp1 = method_getImplementation(m1);
 IMP imp2 = method_getImplementation(m2);
@@ -287,13 +289,364 @@ func ivar_getOffset(_ v: Ivar) -> Int
 - `conformsToProtocol`:检查对象是否实现了指定协议类的方法
 - `methodForSelector`: 返回指定方法实现的地址
 
+## 3. 应用场景
 
-## 方法调用和消息转发
+
+
+### 3.1 MethodSwizzling
+
+这项技术主要基于以下几个接口来实现：
+
+```swift
+func class_replaceMethod(_ cls: AnyClass?, _ name: Selector, _ imp: IMP, _ types: UnsafePointer<Int8>?) -> IMP?
+func method_exchangeImplementations(_ m1: Method, _ m2: Method)
+```
+
+实现过程：
+
+```Object-C
+static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        //case1: 替换实例方法
+        Class selfClass = [self class];
+        //case2: 替换类方法
+        Class selfClass = object_getClass([self class]);
+        
+        //源方法的SEL和Method
+        SEL oriSEL = @selector(viewWillAppear:);
+        Method oriMethod = class_getInstanceMethod(selfClass, oriSEL);
+        
+        //交换方法的SEL和Method
+        SEL cusSEL = @selector(customViewWillApper:);
+        Method cusMethod = class_getInstanceMethod(selfClass, cusSEL);
+        
+        //先尝试給源方法添加实现，这里是为了避免源方法没有实现的情况
+        BOOL addSucc = class_addMethod(selfClass, oriSEL, method_getImplementation(cusMethod), method_getTypeEncoding(cusMethod));
+        if (addSucc) {
+            //添加成功：将源方法的实现替换到交换方法的实现
+            class_replaceMethod(selfClass, cusSEL, method_getImplementation(oriMethod), method_getTypeEncoding(oriMethod));
+        }else {
+            //添加失败：说明源方法已经有实现，直接将两个方法的实现交换即可
+            method_exchangeImplementations(oriMethod, cusMethod);
+        }
+    });
+```
+
+#### 3.1.1 Hook
+
+在开发中，经常用到系统提供的API，但出于某些需求，我们可能会对某些方法的实现不太满意，就想去修改它以达到更好的效果，Hook由此诞生。iOS开发会使用Method Swizzling来达到这样的效果：当特定的消息发出时，会先到达我们提前预置的消息处理函数，取得控制权来加工消息以及后续处理。
+
+案例一：
+
+项目需要更换所有图标，新的图片资源比旧图片多了一个前缀“new_”。对于所有使用 `imageNamed:` 加载的图片可以使用如下方案实现替换：
+
+```Object-C
+// 給全局图片名称添加前缀
+@implementation UIImage (Hook)
+
++ (void)load {
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        
+        Class selfClass = object_getClass([self class]);
+        
+        SEL oriSEL = @selector(imageNamed:);
+        Method oriMethod = class_getInstanceMethod(selfClass, oriSEL);
+        
+        SEL cusSEL = @selector(myImageNamed:);
+        Method cusMethod = class_getInstanceMethod(selfClass, cusSEL);
+        
+        BOOL addSucc = class_addMethod(selfClass, oriSEL, method_getImplementation(cusMethod), method_getTypeEncoding(cusMethod));
+        if (addSucc) {
+            class_replaceMethod(selfClass, cusSEL, method_getImplementation(oriMethod), method_getTypeEncoding(oriMethod));
+        }else {
+            method_exchangeImplementations(oriMethod, cusMethod);
+        }
+        
+    });
+}
+
++ (UIImage *)myImageNamed:(NSString *)name {
+
+    NSString * newName = [NSString stringWithFormat:@"%@%@", @"new_", name];
+    return [self myImageNamed:newName];
+}
+
+@end
+```
+
+#### 3.1.2 AOP面向切面编程
+
+利用AOP可以对业务逻辑的各个部分进行隔离，从而使得业务逻辑各部分之间的耦合度降低，提高程序的可重用性，同时提高了开发的效率。
+
+案例：
+
+需要跟踪记录APP中按钮的点击次数和频率等数据：
+
+```Object-C
+@implementation UIButton (Hook)
+
++ (void)load {
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        
+        Class selfClass = [self class];
+        
+        SEL oriSEL = @selector(sendAction:to:forEvent:);
+        Method oriMethod = class_getInstanceMethod(selfClass, oriSEL);
+        
+        SEL cusSEL = @selector(mySendAction:to:forEvent:);
+        Method cusMethod = class_getInstanceMethod(selfClass, cusSEL);
+        
+        BOOL addSucc = class_addMethod(selfClass, oriSEL, method_getImplementation(cusMethod), method_getTypeEncoding(cusMethod));
+        if (addSucc) {
+            class_replaceMethod(selfClass, cusSEL, method_getImplementation(oriMethod), method_getTypeEncoding(oriMethod));
+        }else {
+            method_exchangeImplementations(oriMethod, cusMethod);
+        }
+        
+    });
+}
+
+- (void)mySendAction:(SEL)action to:(id)target forEvent:(UIEvent *)event {
+    [CountTool addClickCount];
+    [self mySendAction:action to:target forEvent:event];
+}
+
+@end
+```
+
+> MethodSwizzling的封装
+> 
+> ```Object-C
+> + (void)swizzleMethods:(Class)class originalSelector:(SEL)origSel swizzledSelector:(SEL)swizSel {
+> 
+> 	Method origMethod = class_getInstanceMethod(class, origSel);
+> 	Method swizMethod = class_getInstanceMethod(class, swizSel);
+> 
+> 	BOOL didAddMethod = class_addMethod(class, origSel,
+> 	method_getImplementation(swizMethod),
+> 	method_getTypeEncoding(swizMethod));
+> 
+> 	if (didAddMethod) {
+> 		class_replaceMethod(class, swizSel, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
+> 	} else {
+> 		method_exchangeImplementations(origMethod, swizMethod);
+> 	}
+> }
+```
+
+### 3.2 字典转模型
+
+遍历模型中的所有属性，根据模型的属性名，去字典中查找对应的 key，取出对应的值，给模型的属性赋值。
+
+```Object-C
+/** 字典转模型 **/
++ (instancetype)modelWithDict:(NSDictionary *)dict {
+    id objc = [[self alloc] init];
+    unsigned int count = 0;
+    // 获取成员属性数组
+    Ivar *ivarList = class_copyIvarList(self, &count);
+    // 遍历所有的成员属性名
+    for (int i = 0; i < count; i ++) {
+        // 获取成员属性
+        Ivar ivar = ivarList[i];
+        // 获取成员属性名
+        NSString *ivarName = [NSString stringWithUTF8String:ivar_getName(ivar)];
+        NSString *key = [ivarName substringFromIndex:1];
+        // 从字典中取出对应 value 给模型属性赋值
+        id value = dict[key];
+        // 获取成员属性类型
+        NSString *ivarType = [NSString stringWithUTF8String:ivar_getTypeEncoding(ivar)];
+        // 判断 value 是不是字典
+        if ([value isKindOfClass:[NSDictionary class]]) {
+            ivarType = [ivarType stringByReplacingOccurrencesOfString:@"@" withString:@""];
+            ivarType = [ivarType stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+            Class modalClass = NSClassFromString(ivarType);
+            // 字典转模型
+            if (modalClass) {
+                // 字典转模型
+                value = [modalClass modelWithDict:value];
+            }
+        }
+        if ([value isKindOfClass:[NSArray class]]) {
+            // 判断对应类有没有实现字典数组转模型数组的协议
+            if ([self respondsToSelector:@selector(arrayContainModelClass)]) {
+                // 转换成id类型，就能调用任何对象的方法
+                id idSelf = self;
+                // 获取数组中字典对应的模型
+                NSString *type = [idSelf arrayContainModelClass][key];
+                // 生成模型
+                Class classModel = NSClassFromString(type);
+                NSMutableArray *arrM = [NSMutableArray array];
+                // 遍历字典数组，生成模型数组
+                for (NSDictionary *dict in value) {
+                    // 字典转模型
+                    id model =  [classModel modelWithDict:dict];
+                    [arrM addObject:model];
+                }
+                // 把模型数组赋值给value
+                value = arrM;
+            }
+        }
+        // KVC 字典转模型
+        if (value) {
+            [objc setValue:value forKey:key];
+        }
+    }
+    return objc;
+}
+```
+
+### 3.3 归档和解档
+
+当我们使用 NSCoding 进行归档及解档时,  不管模型里面有多少属性, 我们都需要对每一个属性实现一遍 `encodeObject` 和 `decodeObjectForKey` 方法, 这个时候用 `runtime`, 便可以充分体验其好处。
+
+```Object-C
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    unsigned int count = 0;
+    // 获取类中所有属性
+    Ivar *ivars = class_copyIvarList(self.class, &count);
+    // 遍历属性
+    for (int i = 0; i < count; i ++) {
+        // 取出 i 位置对应的属性
+        Ivar ivar = ivars[i];
+        // 查看属性
+        const char *name = ivar_getName(ivar);
+        NSString *key = [NSString stringWithUTF8String:name];
+        // 利用 KVC 进行取值，根据属性名称获取对应的值
+        id value = [self valueForKey:key];
+        [aCoder encodeObject:value forKey:key];
+    }
+    free(ivars);
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super init]) {
+        unsigned int count = 0;
+        // 获取类中所有属性
+        Ivar *ivars = class_copyIvarList(self.class, &count);
+        // 遍历属性
+        for (int i = 0; i < count; i ++) {
+            // 取出 i 位置对应的属性
+            Ivar ivar = ivars[i];
+            // 查看属性
+            const char *name = ivar_getName(ivar);
+            NSString *key = [NSString stringWithUTF8String:name];
+            // 进行解档取值
+            id value = [aDecoder decodeObjectForKey:key];
+            // 利用 KVC 对属性赋值
+            [self setValue:value forKey:key];
+        }
+    }
+    return self;
+}
+```
+
+## 4. 方法调用和消息转发
+
+在 OC 中，当一个实例的方法被调用时，会发生如下过程：
+
+- 调用 `objc_msgSend(receiver, selector)` 发送消息
+- `receiver` 在其方法缓存中查找该方法，若存在则执行，若不存在继续下面操作
+- `receiver` 在其方法列表中查找该方法，若存在则执行，并写入方法缓存。若不存在继续下面操作
+- `receiver` 向其父类查找，一直找到根类，若存在则执行，若不存在继续下面操作
+- 进入 `class func resolveInstanceMethod(_ sel: Selector!) -> Bool` 
+
+```Object-C
+//在这个方法中我们可以利用runtime的特性动态添加方法来处理，具体如下：
+void dynamicMethodIMP(id self, SEL _cmd) { 
+	// implementation ....
+}
++ (BOOL)resolveInstanceMethod:(SEL)sel {
+	NSLog(@"sel is %@", NSStringFromSelector(sel));
+	if(sel == @selector(setName:)){
+		class_addMethod([self class],sel,(IMP)dynamicMethodIMP,"v@:");
+		return YES;
+	}
+	return [super resolveInstanceMethod:sel];
+}
+```
+
+- 进入 `class func forwardingTarget(for aSelector: Selector!) -> Any?`
+
+```Object-C
+// 我们可以在此方法中设置可以处理该方法的代理对象
+- (id)forwardingTargetForSelector:(SEL)aSelector
+{
+    //如果代理对象能处理，则转接给代理对象
+    if ([proxyObj respondsToSelector:aSelector]) {
+        return proxyObj;
+    }
+    //不能处理进入转发流程
+    return nil;
+} 
+```
+
+- 如果上述两个时机都无法处理消息，则会进入消息转发流程，其关键方法是：
+
+```Object-C
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+- (void)forwardInvocation:(NSInvocation *)anInvocation
+```
+如果 `methodSignatureForSelector` 返回`nil`，则不会继续执行 `forwardInvocation`，转发流程终止，抛出无法处理的异常。
+
+如果 `methodSignatureForSelector` 返回了方法签名，我们还有最后一次机会处理这个消息，那就是在 `forwardInvocation` 回调里，具体可以按照如下的方式使用：
+
+```Object-C
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+{
+    NSMethodSignature *sig = [BBMessageForwardProxy instanceMethodSignatureForSelector:@selector(bb_dealNotRecognizedMessage:)];
+    return sig;
+}
+
+- (void)forwardInvocation:(NSInvocation *)anInvocation
+{
+    NSString *debugInfo = [NSString stringWithFormat:@"[debug]unRecognizedMessage:[%@] sent to [%@]",NSStringFromSelector(anInvocation.selector),NSStringFromClass([self class])];
+    //重定向方法
+    [anInvocation setSelector:@selector(bb_dealNotRecognizedMessage:)];
+    //传递调用信息
+    [anInvocation setArgument:&debugInfo atIndex:2];
+    //BBMessageForwardProxy对象接收转发的消息并打印调用信息
+    [anInvocation invokeWithTarget:[BBMessageForwardProxy new]];
+}
+
+
+// BBMessageForwardProxy.h
+
+#import <Foundation/Foundation.h>
+
+@interface BBMessageForwardProxy : NSObject
+
+- (void)bb_dealNotRecognizedMessage:(NSString *)debugInfo;
+
+@end
+
+// BBMessageForwardProxy.m
+
+#import "BBMessageForwardProxy.h"
+
+@implementation BBMessageForwardProxy
+
+- (void)bb_dealNotRecognizedMessage:(NSString *)debugInfo
+{
+    NSLog(@"%@",debugInfo);
+}
+```
+
+至此我们在消息转发的最后一个环节里将无法识别的消息转发到了一个 Proxy 类统一打印处理。
+
+![Runtime_02](Runtime_02.png)
+
 
 参考链接
 
-- [https://github.com/opensource-apple/objc4/blob/master/runtime](https://github.com/opensource-apple/objc4/blob/master/runtime)
+- [https://github.com/opensource-apple/objc4](https://github.com/opensource-apple/objc4)
 - [Objective-C Runtime](https://hit-alibaba.github.io/interview/iOS/ObjC-Basic/Runtime.html)
 - [深度揭秘Runtime原理](https://mp.weixin.qq.com/s/BDZoz1zqfduX9kZP0Z0KyA)
 - [iOS 开发中 runtime 常用的几种方法](https://mp.weixin.qq.com/s/oKTdrwqk66Z1Y96WnQF_CA)
 - [Swift5.0的Runtime机制浅析](https://mp.weixin.qq.com/s/qPlg716RqtiT2PK_WqtBZQ)
+- [iOS runtime实战应用：Method Swizzling](https://www.jianshu.com/p/3efc3e94b14c)
+- [iOS runtime 之消息转发](https://www.jianshu.com/p/5127ce0628be)
