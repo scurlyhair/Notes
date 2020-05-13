@@ -262,7 +262,7 @@ func method_copyReturnType(_ m: Method) -> UnsafeMutablePointer<Int8>
 // 交换两个方法的实现
 func method_exchangeImplementations(_ m1: Method, _ m2: Method)
 ```
-```Object-C
+```objc
 // This is an atomic version of the following:
 IMP imp1 = method_getImplementation(m1);
 IMP imp2 = method_getImplementation(m2);
@@ -304,7 +304,7 @@ func method_exchangeImplementations(_ m1: Method, _ m2: Method)
 
 实现过程：
 
-```Object-C
+```objc
 static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         //case1: 替换实例方法
@@ -340,7 +340,7 @@ static dispatch_once_t onceToken;
 
 项目需要更换所有图标，新的图片资源比旧图片多了一个前缀“new_”。对于所有使用 `imageNamed:` 加载的图片可以使用如下方案实现替换：
 
-```Object-C
+```objc
 // 給全局图片名称添加前缀
 @implementation UIImage (Hook)
 
@@ -384,7 +384,7 @@ static dispatch_once_t onceToken;
 
 需要跟踪记录APP中按钮的点击次数和频率等数据：
 
-```Object-C
+```objc
 @implementation UIButton (Hook)
 
 + (void)load {
@@ -418,31 +418,28 @@ static dispatch_once_t onceToken;
 @end
 ```
 
-> MethodSwizzling的封装
-> 
-> ```Object-C
-> + (void)swizzleMethods:(Class)class originalSelector:(SEL)origSel swizzledSelector:(SEL)swizSel {
-> 
-> 	Method origMethod = class_getInstanceMethod(class, origSel);
-> 	Method swizMethod = class_getInstanceMethod(class, swizSel);
-> 
-> 	BOOL didAddMethod = class_addMethod(class, origSel,
-> 	method_getImplementation(swizMethod),
-> 	method_getTypeEncoding(swizMethod));
-> 
-> 	if (didAddMethod) {
-> 		class_replaceMethod(class, swizSel, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
-> 	} else {
-> 		method_exchangeImplementations(origMethod, swizMethod);
-> 	}
-> }
+MethodSwizzling的封装
+
+```objc
++ (void)swizzleMethods:(Class)class originalSelector:(SEL)origSel swizzledSelector:(SEL)swizSel {
+    
+    Method origMethod = class_getInstanceMethod(class, origSel);
+    Method swizMethod = class_getInstanceMethod(class, swizSel);
+    
+    BOOL didAddMethod = class_addMethod(class, origSel, method_getImplementation(swizMethod), method_getTypeEncoding(swizMethod));
+    if (didAddMethod) {
+        class_replaceMethod(class, swizSel, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
+    } else {
+        method_exchangeImplementations(origMethod, swizMethod);
+    }
+}
 ```
 
 ### 3.2 字典转模型
 
 遍历模型中的所有属性，根据模型的属性名，去字典中查找对应的 key，取出对应的值，给模型的属性赋值。
 
-```Object-C
+```objc
 /** 字典转模型 **/
 + (instancetype)modelWithDict:(NSDictionary *)dict {
     id objc = [[self alloc] init];
@@ -504,7 +501,7 @@ static dispatch_once_t onceToken;
 
 当我们使用 NSCoding 进行归档及解档时,  不管模型里面有多少属性, 我们都需要对每一个属性实现一遍 `encodeObject` 和 `decodeObjectForKey` 方法, 这个时候用 `runtime`, 便可以充分体验其好处。
 
-```Object-C
+```objc
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     unsigned int count = 0;
     // 获取类中所有属性
@@ -555,7 +552,7 @@ static dispatch_once_t onceToken;
 - `receiver` 向其父类查找，一直找到根类，若存在则执行，若不存在继续下面操作
 - 进入 `class func resolveInstanceMethod(_ sel: Selector!) -> Bool` 
 
-```Object-C
+```objc
 //在这个方法中我们可以利用runtime的特性动态添加方法来处理，具体如下：
 void dynamicMethodIMP(id self, SEL _cmd) { 
 	// implementation ....
@@ -572,7 +569,7 @@ void dynamicMethodIMP(id self, SEL _cmd) {
 
 - 进入 `class func forwardingTarget(for aSelector: Selector!) -> Any?`
 
-```Object-C
+```objc
 // 我们可以在此方法中设置可以处理该方法的代理对象
 - (id)forwardingTargetForSelector:(SEL)aSelector
 {
@@ -587,7 +584,7 @@ void dynamicMethodIMP(id self, SEL _cmd) {
 
 - 如果上述两个时机都无法处理消息，则会进入消息转发流程，其关键方法是：
 
-```Object-C
+```objc
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
 - (void)forwardInvocation:(NSInvocation *)anInvocation
 ```
@@ -595,7 +592,7 @@ void dynamicMethodIMP(id self, SEL _cmd) {
 
 如果 `methodSignatureForSelector` 返回了方法签名，我们还有最后一次机会处理这个消息，那就是在 `forwardInvocation` 回调里，具体可以按照如下的方式使用：
 
-```Object-C
+```objc
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
 {
     NSMethodSignature *sig = [BBMessageForwardProxy instanceMethodSignatureForSelector:@selector(bb_dealNotRecognizedMessage:)];
