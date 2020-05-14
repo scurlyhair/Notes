@@ -177,13 +177,136 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,struct sockaddr *s
 ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags);
 ```
 
-## 3 如何使用
-
-## Socket.io
+## 3 WebSocket
 
 
+WebSocket 基于 HTTP，建立在 TCP 协议之上的全双工**协议**。与 HTTP 协议有着良好的兼容性。默认端口也是 80 和 443，并且握手阶段采用 HTTP 协议，因此握手时不容易屏蔽，能通过各种 HTTP 代理服务器。
 
-## 其他
+协议标识符是ws（如果加密，则为wss），服务器网址就是 URL。
+
+```js
+ws://example.com:80/some/path
+```
+
+![Socket_04](Socket_04.jpg)
+
+### 3.1 API
+
+**创建实例**
+
+```js
+var ws = new WebSocket('ws://localhost:8080');
+```
+**连接状态**
+
+```webSocket.readyState``` 返回实例对象当前的连接状态
+
+- CONNECTING：值为0，表示正在连接。
+- OPEN：值为1，表示连接成功，可以通信了。
+- CLOSING：值为2，表示连接正在关闭。
+- CLOSED：值为3，表示连接已经关闭，或者打开连接失败。
+
+**事件监听**
+
+on函数
+
+```js
+// 连接成功
+ws.addEventListener('open', function (event) {
+  ws.send('Hello Server!');
+});
+// 连接关闭
+ws.addEventListener("close", function(event) {
+  var code = event.code;
+  var reason = event.reason;
+  var wasClean = event.wasClean;
+  // handle close event
+});
+// 接收到消息
+ws.addEventListener("message", function(event) {
+  var data = event.data;
+  // 处理数据
+});
+// 发生错误
+socket.addEventListener("error", function(event) {
+  // handle error event
+});
+```
+
+addEventListener 函数
+
+```js
+// 连接成功
+ws.onopen = function () {
+  ws.send('Hello Server!');
+}
+// 连接关闭
+ws.onclose = function(event) {
+  var code = event.code;
+  var reason = event.reason;
+  var wasClean = event.wasClean;
+  // handle close event
+};
+// 接收到消息
+ws.onmessage = function(event) {
+  var data = event.data;
+  // 处理数据
+};
+// 发生错误
+socket.onerror = function(event) {
+  // handle error event
+};
+```
+
+**发送**
+
+```js
+// 文本
+ws.send('your message');
+// blob 对象
+
+var file = document
+  .querySelector('input[type="file"]')
+  .files[0];
+ws.send(file);
+// ArrayBuffer
+// Sending canvas ImageData as ArrayBuffer
+var img = canvas_context.getImageData(0, 0, 400, 320);
+var binary = new Uint8Array(img.data.length);
+for (var i = 0; i < img.data.length; i++) {
+  binary[i] = img.data[i];
+}
+ws.send(binary.buffer);
+```
+
+**webSocket.bufferedAmount**
+
+标识还有多少字节的二进制数据没有发送出去
+
+```js
+var data = new ArrayBuffer(10000000);
+socket.send(data);
+
+if (socket.bufferedAmount === 0) {
+  // 发送完毕
+} else {
+  // 发送还没结束
+}
+```
+
+### 3.2 Socket.io
+
+Socket.io 是基于 WebSocket 封装的框架。
+
+在一些特性的应用场景下，我们需要实现客户端和服务器的双向通信。在 H5 之前需要使用轮询的方式来实现，浪费资源且效率低下。
+
+HTML5 开始支持 WebSocket 协议，但是浏览器对HTML5的支持情况不同，在不支持 WebSocket 协议的情况下就需要使用 http + 轮询 来实现需求。
+
+Socket.io 的出现就是为了解决这种状况，它封装了 WebSocket 和轮询等方法，会针对不同的平台或者浏览器的兼容情况选择恰当的方式进行处理，开发人员不必去关心具体的实现细节。
+
+Socket.io 的服务端由 node.js 实现。
+
+## 4 其他
 
 ### Socket 使用 tcp 和 udp 传输方式的区别：
 
@@ -199,24 +322,15 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags);
 
 对于可靠性要求高，延时要求次之的场景使用 TCP。例如 IM 即时通讯。
 
+**其他**
 
+UDP 是不需要和 TCP一样在发送数据前进行三次握手建立连接的，
 
-UDP 支持一对多(Mulitcast)模式,能大大节省网络带宽，减轻数据源端的压力。
+UDP 不止支持一对一的传输方式，同样支持一对多，多对多，多对一的方式，也就是说 UDP 提供了单播，多播，广播的功能。
 
-tcp 流式传输
-udp 包式传输
+tcp 面向字节流传输
+udp 面向报文传输
 
-nat 穿透
-
-### 相同主机不同进程之间的通信
-
-### 网络传输过程中为什么会丢包
-
-### Socket、WebSocket 和 HTTP
-
-WebSocket 是跟 HTTP 对应的，基于 TCP 协议之上的「长连接」协议。
-
-Socket 是由操作系统提供的，对 TCP/IP 协议抽象出来的接口。
 
 ### 通讯模式
 
@@ -227,3 +341,4 @@ Socket 是由操作系统提供的，对 TCP/IP 协议抽象出来的接口。
 参考链接：
 
 - [socket原理详解](https://www.cnblogs.com/zengzy/p/5107516.html)
+- [WebSocket 教程](https://www.ruanyifeng.com/blog/2017/05/websocket.html)
