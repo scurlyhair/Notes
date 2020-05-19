@@ -209,6 +209,142 @@ queue.async {
  */
 ```
 
+## 3 NSCondition
+
+### NSCondition + GCD
+
+需求场景： 
+
+并发执行下载任务一、下载任务二，两个文件都下载完成之后执行任务三。
+
+```swift
+func download() {
+    let queue = DispatchQueue.global()
+    
+    // 下载任务一
+    let workItem1 = DispatchWorkItem {
+        let condition = NSCondition()
+        
+        DownLoader().download(urlString: urlA, onSuccess: { tmpURL, response, error in
+            print("download 1 complete")
+            print(Thread.current)
+            condition.signal()
+        })
+        
+        condition.lock()
+        condition.wait()
+        condition.unlock()
+    }
+    // 下载任务二
+    let workItem2 = DispatchWorkItem {
+        let condition = NSCondition()
+        
+        DownLoader().download(urlString: urlB, onSuccess: { tmpURL, response, error in
+            print("download 2 complete")
+            print(Thread.current)
+            condition.signal()
+        })
+        
+        condition.lock()
+        condition.wait()
+        condition.unlock()
+    }
+    // 任务三
+    let workItem3 = DispatchWorkItem {
+        print("all download complete")
+    }
+    
+    
+    let group = DispatchGroup()
+    group.enter()
+    queue.async(group: group, execute: workItem1)
+    group.leave()
+    group.enter()
+    queue.async(group: group, execute: workItem2)
+    group.leave()
+    group.notify(queue: queue, work: workItem3)
+}
+
+```
+
+### NSCondition + Thread
+
+用于协调线程间的通信
+
+需求：
+
+1. 模拟下载五张图片、五篇文章；
+2. 图片下载了两张之后，暂停下载，转而开启文章下载；
+3. 下载三篇文章之后，暂停下载，转而继续下载剩下的三张图片。
+4. 图片下载完成后，下载完成剩下的两篇文章。
+
+> 假设下载均为同步操作
+
+```swift
+class ViewController: UIViewController {
+    var downImages: Thread?
+    var downArticles: Thread?
+    
+    let imageCondition = NSCondition()
+    let articleCondition = NSCondition()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        downImages = Thread(target: self, selector: #selector(downloadImages), object: nil)
+        downArticles = Thread(target: self, selector: #selector(downloadArticles), object: nil)
+        downImages?.start()
+        
+    }
+    
+    @objc private func threadPrint() {
+        Thread.sleep(forTimeInterval: 2)
+        print("After 2 seconds, I have been performed. I am \(Thread.current)")
+    }
+    
+    @objc fileprivate func downloadImages() {
+        for index in 1...5 {
+            print("Downloading No.\(index) image.")
+            Thread.sleep(forTimeInterval: 1)
+            
+            if index == 2 {
+                //start downArticles.开启下载文章的线程
+                downArticles?.start()
+                
+                //Lock the image thread.加锁，让下载图片的线程进入等待状态
+                imageCondition.lock()
+                imageCondition.wait()
+                imageCondition.unlock()
+            }
+        }
+        print("All images have been completed.")
+        
+        //Signaling the article when all images completed.
+//        等图片都下载完成之后，激活下载文章的进程
+        articleCondition.signal()
+    }
+    
+    @objc fileprivate func downloadArticles() {
+        for index in 1...5 {
+            print("The No.\(index) article will be downloading.")
+            Thread.sleep(forTimeInterval: 1)
+            if index == 3 {
+                //Signaling the image thread, let it continue to down.
+                //激活图片的线程，让它继续下载图片
+                imageCondition.signal()
+                
+                //Lock the article thread.加锁，让下载文章的线程进入等待状态
+                articleCondition.lock()
+                articleCondition.wait()
+                articleCondition.unlock()
+                
+            }
+        }
+        print("There are 5 articles.")
+        
+    }
+}
+```
+
 
 
 
