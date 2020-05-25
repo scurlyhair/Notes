@@ -329,5 +329,4 @@ one.mutate { $0 += 1 }
 参考链接：
 
 - [Atomic Properties in Swift](https://www.vadimbulavin.com/atomic-properties/)
-
-
+- [Swift Atomic Properties with Property Wrappers](https://www.vadimbulavin.com/swift-atomic-properties-with-property-wrappers/)
