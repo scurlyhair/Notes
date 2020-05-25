@@ -1,8 +1,9 @@
 # GCD
 
-Grand CentralDispatch
+Grand Central Dispatch 是苹果官方重点推荐的并发技术，可以高效地协调线程和异步操作。GCD是一种 **task-based** 的解决方案，它将多线程操作封装起来，程序员只需要专注于并发逻辑本身，而不需要过多考虑多线程的实现细节。相较于 **thread-based** 解决方案，这让并发逻辑的实现变得简单同时也使代码逻辑更加直观（具有更强的可读性）。
 
-## 1 定义
+## 1 基本概念
+
 ### 1.1 DispatchQueue
 任务分发队列
 #### 创建
@@ -68,9 +69,98 @@ Grand CentralDispatch
 - `wait()`
 - `siginal()`
 
+## 2 原理
 
-## 2 常用场景
-### 2.1 耗时任务
+GCD 的本质就是对一系列 **Work Item** 进行的多线程操作。
+
+`DispatchWorkItem` 类的实例代表了一个单独的任务，它的主体是一个 Swift 闭包。当 `DispatchQueue.async` 方法被调用的时候，这些任务就会入队，任务执行完会自动出队。可以通过设置的 Qos（quality-of-service）定义任务执行的优先级。
+
+任务可以进行分组管理。 `DispatchGroup` 可以对多个任务进行编组，将这些任务视为一个单元，实现统一操作。
+
+在创建队列时，我们可以通过指定 `DispatchQueue` 的 `attributes` 为 `[.concurrent]` 将队列设置为并发队列。如果不指定则串行队列。
+
+```swift
+// 创建并发队列
+let concurrentQueue = DispatchQueue(label: "concurrent_queue", qos: .default, attributes: [.concurrent], autoreleaseFrequency: .inherit, target: nil)
+// 创建串行队列
+let serialQueue = DispatchQueue(label: "serial_queue")
+```
+
+影响任务执行顺序的有三个维度，分别是：
+
+- 优先级
+- 队列类别：串行（serial）/并发（concurrent）
+- 加入队列的方式：同步（sync）/异步（async）
+
+> 以 `DispatchQueue.sync` 加入队列的任务，要等待其执行完成后才会把控制权交还给调用函数。 而以 `DispatchQueue.async` 加入队列的任务，会直接将控制权交回。
+
+在串行队列中，一个任务执行完成之后，才会执行下一个任务。并发队列则是将任务依次载入并执行。
+
+```swift
+// 串行同步
+serialQueue.sync {
+    print("1")
+    sleep(1)
+    print("2")
+}
+print("take control")
+serialQueue.sync {
+    print("3")
+    sleep(1)
+    print("4")
+}
+// 1 2 take_control 3 4
+
+// 串行异步
+serialQueue.async {
+    print("1")
+    sleep(1)
+    print("2")
+}
+print("take_control")
+serialQueue.async {
+    print("3")
+    sleep(1)
+    print("4")
+}
+// 1 take_control 2 3 4
+
+// 并发同步
+concurrentQueue.sync {
+    print("1")
+    sleep(1)
+    print("2")
+}
+print("take_control")
+concurrentQueue.sync {
+    print("3")
+    sleep(1)
+    print("4")
+}
+// 1 2 take_control 3 4
+
+// 并发异步
+concurrentQueue.async {
+    print("1")
+    sleep(1)
+    print("2")
+}
+print("take_control")
+concurrentQueue.async {
+    print("3")
+    sleep(1)
+    print("4")
+}
+// 1 take_control 3 2 4、1 take_control 3 4 2、take_control 1 3 2 4、 take_control 1 3 4 2
+```
+
+GCD内部维护了一个线程池来执行队列中的任务。这些线程没有明确的生命周期，当此线程中的任务完成时可能被销毁，或者继续执行其它 work item。如果线程池中所有的线程都处于忙碌状态，且有新的任务加入进来，系统会在线程池中唤起一个新的线程。
+
+GCD预先创建了一些线程供队列使用。其中主线程 `DispatchQueue.main` 是一个串行队列，其它线程均为不同优先级的并发队列。
+
+
+## 3 常用场景
+### 3.1 耗时任务
 ```swift
 // 耗时任务
 let item1 = DispatchWorkItem {
@@ -91,7 +181,7 @@ item1.wait()
 DispatchQueue.main.async(execute: item2)
 ```
 
-### 2.2 多任务调度
+### 3.2 多任务调度
 在`queue1`执行`item1`，在`queue2`执行`item2`，两个任务都执行完成之后在主队列执行`item3`。
 
 ```swift
@@ -124,7 +214,7 @@ group.leave()
 group.notify(queue: DispatchQueue.main, work: item3)
 ```
 
-### 2.3 线程锁
+### 3.3 线程锁
 有两种方法，分别是`DispatchSemaphore` 和任务对象`DispatchWorkItemFlag`的`Barrier`模式。
 #### DispatchSemaphore
 设定两个线程可用，不同队列
@@ -209,7 +299,7 @@ queue.async {
  */
 ```
 
-## 3 NSCondition
+## 4 NSCondition
 
 ### NSCondition + GCD
 
