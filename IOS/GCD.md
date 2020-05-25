@@ -77,6 +77,8 @@ GCD 的本质就是对一系列 **Work Item** 进行的多线程操作。
 
 任务可以进行分组管理。 `DispatchGroup` 可以对多个任务进行编组，将这些任务视为一个单元，实现统一操作。
 
+### 2.1 并发/串行&同步/异步
+
 在创建队列时，我们可以通过指定 `DispatchQueue` 的 `attributes` 为 `[.concurrent]` 将队列设置为并发队列。如果不指定则串行队列。
 
 ```swift
@@ -154,9 +156,53 @@ concurrentQueue.async {
 // 1 take_control 3 2 4、1 take_control 3 4 2、take_control 1 3 2 4、 take_control 1 3 4 2
 ```
 
+### 2.2 队列（Queue）&线程（Thread）
+
+GCD预先创建了一些线程供队列使用。其中主线程 `DispatchQueue.main` 是一个串行队列，其它线程均为不同优先级的并发队列通过`DispatchQueue.global`方法获取。
+
 GCD内部维护了一个线程池来执行队列中的任务。这些线程没有明确的生命周期，当此线程中的任务完成时可能被销毁，或者继续执行其它 work item。如果线程池中所有的线程都处于忙碌状态，且有新的任务加入进来，系统会在线程池中唤起一个新的线程。
 
-GCD预先创建了一些线程供队列使用。其中主线程 `DispatchQueue.main` 是一个串行队列，其它线程均为不同优先级的并发队列。
+线程池中的最大线程数是有一定限制的，经过测试，在iPhone8 模拟器上是65个左右。编写代码并发代码时应当考虑到这一点，对并发数进行限制，否则，可能会导致系统出现不可预测的行为。
+
+```swift
+let concurrentTasks = 3
+
+let queue = DispatchQueue(label: "Concurrent queue", attributes: .concurrent)
+let sema = DispatchSemaphore(value: concurrentTasks)
+
+for _ in 0..<999 {
+    queue.async {
+        // Do work
+        sema.signal()
+    }
+    sema.wait()
+}
+```
+
+GCD 提供了一个高效的并行循环类方法，它让一个闭包并行地执行指定次数：
+
+```swift
+// iterations - 执行次数 work - 任务闭包 闭包中的 Int 参数表示当前任务的index
+DispatchQueue.concurrentPerform(iterations: Int, execute work: (Int) -> Void)
+// 示例
+DispatchQueue.global().async {
+    DispatchQueue.concurrentPerform(iterations: 999) { index in
+        // Do something
+    }
+}
+```
+
+### 2.3 并发（concurrency）&并行（parallellism）
+
+并发和并行都是完成多任务更加有效率的方式，但还是有一些区别的，并发（concurrency），并行（parallellism），可见他们的确是有区别的。
+
+可以用下面的例子帮助理解：
+
+假设一个有三个学生需要辅导作业，帮每个学生辅导完作业是一个任务。
+
+- 顺序执行：老师甲先帮学生A辅导，辅导完之后再取给B辅导，最后再去给C辅导，效率低下 ，很久才完成三个任务
+- 并发：老师甲先给学生A去讲思路，A听懂了自己书写过程并且检查，而甲老师在这期间直接去给B讲思路，讲完思路再去给C讲思路，让B自己整理步骤。这样老师就没有空着，一直在做事情，很快就完成了三个任务。与顺序执行不同的是，顺序执行，老师讲完思路之后学生在写步骤，这在这期间，老师是完全空着的，没做事的，所以效率低下。
+- 并行：直接让三个老师甲、乙、丙三个老师“同时”给三个学生辅导作业，也完成的很快。
 
 
 ## 3 常用场景
@@ -435,8 +481,6 @@ class ViewController: UIViewController {
 }
 ```
 
+参考链接：
 
-
-
-
-
+- [Grand Central Dispatch (GCD) Tutorial in Swift 5](https://www.vadimbulavin.com/grand-central-dispatch-in-swift/)
