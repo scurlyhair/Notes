@@ -29,10 +29,13 @@
 	- 获取指定类型的字符串
 	- 根据颜色编码产生 `UIColor` 实例
 - [验证码产生器](Tools/CaptchaView.swift)
+- [控制台](Tools/Console.swift)
 
 ## 语言
 
 - [Swift](Language/Swift.md)
+- [构建 Swift 编译工具](https://www.polidea.com/blog/how-to-build-swift-compiler-based-tool-the-step-by-step-guide/)
+- [代码生成](Language/CodeGenerate.md)
 
 
 ## 数据结构

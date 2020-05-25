@@ -262,7 +262,7 @@ func test_StartDownload_Performance() {
 
 ### 2.4 Code Coverage
 
-代码覆盖率工具可以帮助你清楚地看到程序中的哪些代码已经（或者还未）完成单元测试。
+代码覆盖率工具可以帮助你清楚地看到程序中的哪些代码已经（或尚未）完成单元测试。
 
 在 Scheme 编辑栏中可以打开代码覆盖率工具。
 
@@ -277,6 +277,11 @@ func test_StartDownload_Performance() {
 命令行运行
 
 ## 其他
+
+### 第三方框架
+
+- [Kiwi](https://github.com/kiwi-bdd/Kiwi) 单元测试框架
+- [Cuckoo](https://github.com/Brightify/Cuckoo) Swift Mocking 框架
 
 ### 单元测试的两种思想
 
