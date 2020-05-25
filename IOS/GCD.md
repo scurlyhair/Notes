@@ -345,7 +345,21 @@ queue.async {
  */
 ```
 
+### 3.4 实现同步请求
+
+```swift
+let semaphore = DispatchSemaphore(value: 0)
+DownLoader().download(urlString: "https://baidu.com") { (url, response, error) in
+    print("request complete")
+    semaphore.signal()
+}
+semaphore.wait()
+print("task compolete")
+```
+
 ## 4 NSCondition
+
+NSCondition 的 `wait()` 方法会阻塞当前线程，使其无法执行其他任务，直到 `signal()` 方法被调用。
 
 ### NSCondition + GCD
 
