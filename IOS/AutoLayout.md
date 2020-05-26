@@ -24,7 +24,7 @@ button2.leading = 1.0 × button1.trailing + 8.0
 
 ### NSLayoutConstraint
 
-`NSLayoutConstraint` 描述了两个 UI 对象之间的约束关系。它可以通过以下遍历构造器创建：
+`NSLayoutConstraint` 描述了两个 UI 对象之间的约束关系。它可以通过以下便利构造器创建：
 
 ```swift
 /*
