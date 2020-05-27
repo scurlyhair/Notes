@@ -115,7 +115,255 @@ Information about project "Example":
 // 显示构建设置表的信息
 xcodebuild -showBuildSettings
 [-json]
+```
 
+> 见附录 1
+
+### 2.2 参数指令
+
+参数指令用于配合 action 使用
+
+```shell
+// 指定project
+-project <projectname>
+
+// 指定 target
+[-target <targetname>]...|-alltargets
+
+// 指定 scheme
+-scheme <schemeName>
+
+// 指定构建方式 Debug/Release
+-configuration <configurationname>
+
+// 指定 architecture
+[-arch <architecture>]... 
+
+// 指定 sdk
+-sdk [<sdkname>|<sdkpath>]
+
+//允许xcodebuild与Apple Developer网站进行通信。 对于自动签名的目标，xcodebuild将创建并更新配置文件，应用程序ID和证书。 对于手动签名的目标，xcodebuild将下载缺失或更新的供应配置文件， 需要在Xcode的帐户首选项窗格中添加开发者帐户。
+-allowProvisioningUpdates
+
+// 如有必要，允许xcodebuild在Apple Developer网站上注册您的目标设备。需要-allowProvisioningUpdates。
+-allowProvisioningDeviceRegistration
+
+// 指定 BuildSetting
+[<buildsetting>=<value>]...  
+
+// 指定archive操作生成归档的路径。或者在使用-exportArchive时指定归档的路径。
+-archivePath
+
+// 指定导出IPA文件到哪个路径，其中在最后要包括IPA文件的名称。
+-exportPath	
+
+// 导出IPA文件时，需要指定一个ExportOptions.plist文件，如果不知道怎么填写这个文件，可以先用Xcode手动打包一次，导出文件中会有ExportOptions.plist，然后手动copy就好。
+-exportOptionsPlist
+
+// 指定生产DerivedData的文件路径
+-derivedDataPath
+
+// 指定生产result的文件路径，其中会包含一个info.plist
+-resultBundlePath
+
+// .xcconfig文件的路径。构建target时使用自定义的设置。这些设置将覆盖所有其他设置，包括在命令行上的设置。
+-xcconfig
+
+
+// YES/NO 控制是否生成代码覆盖率
+-enableCodeCoverage
+
+// 使用 ISO 639-1 语种名称来指定 test 时的APP语言
+-testLanguage
+
+// 使用使用 ISO 3166-1 地区名称来指定 test 时的APP地区
+-testRegion
+
+// 通过destination描述来指定设备，例如'platform=iOS Simulator,name=iPhone 6s,OS=11.2'
+-destination
+
+// 指定搜索目标设备的超时时间，默认值是30秒
+-destination-timeout
+
+// 限制最多多少台并发测试
+-maximum-concurrent-test-simulator-destinations
+
+// 限制最多多少台真实设备并发测试
+-maximum-concurrent-test-device-destinations
+
+
+// 指定目录或单个XLIFF本地化文件的路径。
+-localizationPath	
+// 指定包含在本地化导出中的可选ISO 639-1语言，可以重复指定多种语言，可能被排除以指定导出仅包含开发语言字符串。
+-exportLanguage
+
+
+// .xctestrun文件的路径。只能在test-without-building操作中存在
+-xctestrun
+
+// 跳过指定的测试单元，然后test剩下的测试单元，测试单元可以是一个测试类或者测试方法。
+-skip-testing
+
+// 只test指定的测试单元，-only-testing优先于-skip-testing
+-only-testing
+
+// 限制并发测试，只能在指定的设备上串行测试
+-disable-concurrent-testing
+
+// 使用identifier或name指定的toolchain
+-toolchain
+
+// 打印将执行的命令，但不执行它们。
+-dry-run, -n	
+
+// 除了警告和错误外，不打印任何输出。
+-quiet
+
+// 显示Xcode和SDK许可协议。 允许接受许可协议，而无需启动Xcode本身。
+-license
+
+// 检查是否需要执行首次启动任务。
+-checkFirstLaunchStatus
+
+// 安装软件包并同意许可证。
+-runFirstLaunch
+```
+
+
+### 2.3 actions
+
+**clean**
+
+```shell
+xcodebuild clean
+-workspace <xxx.workspace>
+-scheme <schemeName>
+-configuration <Debug|Release>
+-sdk<sdkName>
+```
+
+**build**
+
+```shell
+xcodebuild build
+-workspace <xxx.workspace>
+-scheme <schemeName>
+-configuration <Debug|Release>
+-sdk<sdkName>
+```
+
+**build-for-testing**
+
+在根目录执行build操作,要求指定一个scheme，然后会在derivedDataPath/Build/Products目录下生成一个.xctestrun文件，这个文件包含执行测试的必要信息。对于每个测试目标，它都包含测试主机路径的条目，一些环境变量，命令行参数等待
+
+**test**
+
+```shell
+// 单元测试
+xcodebuild test 
+-project <projectName>
+-scheme <schemeName>
+-destination 'platform=iOS Simulator,name=iPhone 6s,OS=11.2' 
+-configuration <Debug/Release>
+-derivedDataPath <derivedDataPath>
+
+// 针对某个target/类/方法进行测试
+xcodebuild test 
+-project <projectName>
+-scheme <schemeName>
+-destination 'platform=iOS Simulator,name=iPhone 6s,OS=11.2' 
+-only-testing:TARGET_NAME/CLASS_NAME/FUNC_NAME 
+-quiet
+
+```
+
+**test-without-build**
+
+UI测试/单元测试，不进行代码编译，利用上次编译的缓存（包括工程编译+测试用例编译），进行重新跑测试。
+
+```shell
+xcodebuild test-without-building 
+-project <projectName>
+-scheme <schemeName>
+-destination 'platform=iOS Simulator,name=iPhone 6s,OS=12.0' 
+-only-testing:TARGET_NAME/CLASS_NAME/FUNC_NAME
+```
+
+UI测试,使用选项-xctestrun生产测试文件，进行测试调试。
+
+```shell
+//1.产生xctestrun文件
+xcodebuild build-for-testing -project PROJECT_NAME.xcodeproj -scheme SCHEME_NAME 
+-destination 'platform=iOS Simulator,name=iPhone 6s,OS=11.2' -
+configuration Debug -derivedDataPath output
+
+-derivedDataPath: derivedDataPath/Build/Products目录下生成一个.xctestrun文件,包含测试信息
+
+//2.使用xctestrun文件（不带-workspace/-project/-scheme参数）
+xcodebuild test-without-building -destination 'platform=iOS Simulator,name=iPhone 6s,OS=12.0' 
+-xctestrun DerivedDataPath.xctestrun -only-testing:TARGET_NAME/CLASS_NAME/FUNC_NAME
+
+-xctestrun：有这个选项就从指定的路径下寻找bundle，没有这个选项在derivedDataPath下寻找bundle
+-only-testing:TARGET_NAME/CLASS_NAME/FUNC_NAME
+```
+
+> test 操作需要指定 destination，其他操作默认 Generic iOS Device
+
+**archive**
+
+```shell
+xcodebuild
+archive -archivePath <archivePath>
+-project <projectName>
+-scheme <schemeName> #从-list命令中获取
+-configuration < Debug|Release>
+-sdk <sdkName> #sdkName可从showsdks命令中获取
+```
+
+**export**
+
+```shell
+xcodebuild
+-exportArchive
+-archivePath <xcarchivepath>
+-exportPath <destinationpath>
+-exportOptionsPlist <plistpath>#这个plist文件可以通过打一次ipa包里面去获取，然后根据需求修改
+```
+
+**archive & export**
+
+```shell
+xcodebuild  -exportArchive
+-archivePath <archivePath> #.archive文件的全路径 eg: .../.../XXX.xcarchive
+-exportPath <exportPath> #ipa文件导出路径
+-exportOptionsPlist <exportOptionsPlistPath> #exportOptionsPlist文件全路径 eg: .../.../XXX.plist
+```
+
+**analyze**
+
+> TODO
+
+**install**
+
+build项目，会在.dst目录下生成一个.app文件,例如这路径。/tmp/UnitTest.dst/Applications/UnitTest.app
+
+**本地化**
+
+```shell
+// 将本地化导出到XLIFF文件。 需要-project和-localizationPath。 不能与action一起使用。
+-exportLocalizations
+
+// 从XLIFF文件导入本地化。 需要-project和-localizationPath。 不能与action一起使用。
+-importLocalizations
+```
+
+**create framework**
+
+## 附录
+
+附录一：BuildSettings
+
+```shell
 Build settings for action build and target Example:
     ACTION = build
     AD_HOC_CODE_SIGNING_ALLOWED = NO
@@ -560,246 +808,6 @@ Build settings for action build and target Example:
     diagnostic_message_length = 165
     variant = normal
 ```
-
-### 2.2 参数指令
-
-参数指令用于配合 action 使用
-
-```shell
-// 指定project
--project <projectname>
-
-// 指定 target
-[-target <targetname>]...|-alltargets
-
-// 指定 scheme
--scheme <schemeName>
-
-// 指定构建方式 Debug/Release
--configuration <configurationname>
-
-// 指定 architecture
-[-arch <architecture>]... 
-
-// 指定 sdk
--sdk [<sdkname>|<sdkpath>]
-
-//允许xcodebuild与Apple Developer网站进行通信。 对于自动签名的目标，xcodebuild将创建并更新配置文件，应用程序ID和证书。 对于手动签名的目标，xcodebuild将下载缺失或更新的供应配置文件， 需要在Xcode的帐户首选项窗格中添加开发者帐户。
--allowProvisioningUpdates
-
-// 如有必要，允许xcodebuild在Apple Developer网站上注册您的目标设备。需要-allowProvisioningUpdates。
--allowProvisioningDeviceRegistration
-
-// 指定 BuildSetting
-[<buildsetting>=<value>]...  
-
-// 指定archive操作生成归档的路径。或者在使用-exportArchive时指定归档的路径。
--archivePath
-
-// 指定导出IPA文件到哪个路径，其中在最后要包括IPA文件的名称。
--exportPath	
-
-// 导出IPA文件时，需要指定一个ExportOptions.plist文件，如果不知道怎么填写这个文件，可以先用Xcode手动打包一次，导出文件中会有ExportOptions.plist，然后手动copy就好。
--exportOptionsPlist
-
-// 指定生产DerivedData的文件路径
--derivedDataPath
-
-// 指定生产result的文件路径，其中会包含一个info.plist
--resultBundlePath
-
-// .xcconfig文件的路径。构建target时使用自定义的设置。这些设置将覆盖所有其他设置，包括在命令行上的设置。
--xcconfig
-
-
-// YES/NO 控制是否生成代码覆盖率
--enableCodeCoverage
-
-// 使用 ISO 639-1 语种名称来指定 test 时的APP语言
--testLanguage
-
-// 使用使用 ISO 3166-1 地区名称来指定 test 时的APP地区
--testRegion
-
-// 通过destination描述来指定设备，例如'platform=iOS Simulator,name=iPhone 6s,OS=11.2'
--destination
-
-// 指定搜索目标设备的超时时间，默认值是30秒
--destination-timeout
-
-// 限制最多多少台并发测试
--maximum-concurrent-test-simulator-destinations
-
-// 限制最多多少台真实设备并发测试
--maximum-concurrent-test-device-destinations
-
-
-// 指定目录或单个XLIFF本地化文件的路径。
--localizationPath	
-// 指定包含在本地化导出中的可选ISO 639-1语言，可以重复指定多种语言，可能被排除以指定导出仅包含开发语言字符串。
--exportLanguage
-
-
-// .xctestrun文件的路径。只能在test-without-building操作中存在
--xctestrun
-
-// 跳过指定的测试单元，然后test剩下的测试单元，测试单元可以是一个测试类或者测试方法。
--skip-testing
-
-// 只test指定的测试单元，-only-testing优先于-skip-testing
--only-testing
-
-// 限制并发测试，只能在指定的设备上串行测试
--disable-concurrent-testing
-
-// 使用identifier或name指定的toolchain
--toolchain
-
-// 打印将执行的命令，但不执行它们。
--dry-run, -n	
-
-// 除了警告和错误外，不打印任何输出。
--quiet
-
-// 显示Xcode和SDK许可协议。 允许接受许可协议，而无需启动Xcode本身。
--license
-
-// 检查是否需要执行首次启动任务。
--checkFirstLaunchStatus
-
-// 安装软件包并同意许可证。
--runFirstLaunch
-```
-
-
-### 2.3 actions
-
-**clean**
-
-```shell
-xcodebuild clean
--workspace <xxx.workspace>
--scheme <schemeName>
--configuration <Debug|Release>
--sdk<sdkName>
-```
-
-**build**
-
-```shell
-xcodebuild build
--workspace <xxx.workspace>
--scheme <schemeName>
--configuration <Debug|Release>
--sdk<sdkName>
-```
-
-**build-for-testing**
-
-在根目录执行build操作,要求指定一个scheme，然后会在derivedDataPath/Build/Products目录下生成一个.xctestrun文件，这个文件包含执行测试的必要信息。对于每个测试目标，它都包含测试主机路径的条目，一些环境变量，命令行参数等待
-
-**test**
-
-```shell
-// 单元测试
-xcodebuild test 
--project <projectName>
--scheme <schemeName>
--destination 'platform=iOS Simulator,name=iPhone 6s,OS=11.2' 
--configuration <Debug/Release>
--derivedDataPath <derivedDataPath>
-
-// 针对某个target/类/方法进行测试
-xcodebuild test 
--project <projectName>
--scheme <schemeName>
--destination 'platform=iOS Simulator,name=iPhone 6s,OS=11.2' 
--only-testing:TARGET_NAME/CLASS_NAME/FUNC_NAME 
--quiet
-
-```
-
-**test-without-build**
-
-UI测试/单元测试，不进行代码编译，利用上次编译的缓存（包括工程编译+测试用例编译），进行重新跑测试。
-
-```shell
-xcodebuild test-without-building 
--project <projectName>
--scheme <schemeName>
--destination 'platform=iOS Simulator,name=iPhone 6s,OS=12.0' 
--only-testing:TARGET_NAME/CLASS_NAME/FUNC_NAME
-```
-
-UI测试,使用选项-xctestrun生产测试文件，进行测试调试。
-
-```shell
-//1.产生xctestrun文件
-xcodebuild build-for-testing -project PROJECT_NAME.xcodeproj -scheme SCHEME_NAME 
--destination 'platform=iOS Simulator,name=iPhone 6s,OS=11.2' -
-configuration Debug -derivedDataPath output
-
--derivedDataPath: derivedDataPath/Build/Products目录下生成一个.xctestrun文件,包含测试信息
-
-//2.使用xctestrun文件（不带-workspace/-project/-scheme参数）
-xcodebuild test-without-building -destination 'platform=iOS Simulator,name=iPhone 6s,OS=12.0' 
--xctestrun DerivedDataPath.xctestrun -only-testing:TARGET_NAME/CLASS_NAME/FUNC_NAME
-
--xctestrun：有这个选项就从指定的路径下寻找bundle，没有这个选项在derivedDataPath下寻找bundle
--only-testing:TARGET_NAME/CLASS_NAME/FUNC_NAME
-```
-
-> test 操作需要指定 destination，其他操作默认 Generic iOS Device
-
-**archive**
-
-```shell
-xcodebuild
-archive -archivePath <archivePath>
--project <projectName>
--scheme <schemeName> #从-list命令中获取
--configuration < Debug|Release>
--sdk <sdkName> #sdkName可从showsdks命令中获取
-```
-
-**export**
-
-```shell
-xcodebuild
--exportArchive
--archivePath <xcarchivepath>
--exportPath <destinationpath>
--exportOptionsPlist <plistpath>#这个plist文件可以通过打一次ipa包里面去获取，然后根据需求修改
-```
-
-**archive & export**
-
-```shell
-xcodebuild  -exportArchive
--archivePath <archivePath> #.archive文件的全路径 eg: .../.../XXX.xcarchive
--exportPath <exportPath> #ipa文件导出路径
--exportOptionsPlist <exportOptionsPlistPath> #exportOptionsPlist文件全路径 eg: .../.../XXX.plist
-```
-
-**analyze**
-
-> TODO
-
-**install**
-
-build项目，会在.dst目录下生成一个.app文件,例如这路径。/tmp/UnitTest.dst/Applications/UnitTest.app
-
-**本地化**
-
-```shell
-// 将本地化导出到XLIFF文件。 需要-project和-localizationPath。 不能与action一起使用。
--exportLocalizations
-
-// 从XLIFF文件导入本地化。 需要-project和-localizationPath。 不能与action一起使用。
--importLocalizations
-```
-
-**create framework**
 
 
 
