@@ -13,7 +13,7 @@
 
 ### 1.2 解释型语言
 
-在程序运行时，解释器会对源代码逐行进行翻译和运行。相较于编译型语言，增加了翻译的内容，所以性能会受到影响。但是得益于 JIT（Just In Time Compilation 即时编译器）的发展，这种差距已经显著的缩小。
+在程序运行时，解释器会对源代码逐行进行翻译和运行。相较于编译型语言，增加了翻译步骤，所以性能会受到影响。但是得益于 JIT（Just In Time Compilation 即时编译器）的发展，这种差距已经显著的缩小。
 
 
 典型的解释型语言有： PHP, Ruby, Python, and JavaScript等。
@@ -157,19 +157,33 @@ Swift 驱动库中包含了 Swift 编译器驱动（Driver）的新版实现，�
 
 本文对 Swift 编译器的主要组件提供了高阶描述：
 
-**解析（Parsing）**：解析器是一个简易的递归下降解析器（在 lib/Parse 中实现），并带有完整手动编码的词法分析器。
+**解析（Parsing）**
 
-**语义分析（Semantic Analysis）**：语义分析阶段（在 lib/Sema 中实现）负责获取已解析的 AST（抽象语法树）并将其转换为格式正确且类型检查完备的 AST，以及在源代码中提示出现语义问题的警告或错误。语义分析包含类型推断，如果可以成功推导出类型，则表明此时从已经经过类型检查的最终 AST 生成代码是安全的。
+解析器是一个简易的递归下降解析器（在 lib/Parse 中实现），并带有完整手动编码的词法分析器。
 
-**Clang 导入器（Clang Importer）**：Clang 导入器（在 lib/ClangImporter 中实现）负责导入 Clang 模块，并将导出的 C 或 Objective-C API 映射到相应的 Swift API 中。最终导入的 AST 可以被语义分析引用。
+**语义分析（Semantic Analysis）**
 
-**SIL 生成（SIL Generation）**：Swift 中间语言（Swift Intermediate Language，SIL）是一门高级且专用于 Swift 的中间语言，适用于对 Swift 代码的进一步分析和优化。SIL 生成阶段（在 lib/SILGen 中实现）将经过类型检查的 AST 弱化为所谓的「原始」SIL。SIL 的设计在 docs/SIL.rst 有所描述。
+语义分析阶段（在 lib/Sema 中实现）负责获取已解析的 AST（抽象语法树）并将其转换为格式正确且类型检查完备的 AST，以及在源代码中提示出现语义问题的警告或错误。语义分析包含类型推断，如果可以成功推导出类型，则表明此时从已经经过类型检查的最终 AST 生成代码是安全的。
 
-**SIL 保证转换（SIL Guaranteed Transformations）**：SIL 保证转换阶段（在 lib/SILOptimizer/Mandatory中实现）负责执行额外且影响程序正确性的数据流诊断（比如使用未初始化的变量）。这些转换的最终结果是「规范」SIL。
+**Clang 导入器（Clang Importer）**
 
-**SIL 优化（SIL Optimizations）**：SIL 优化阶段（在 lib/Analysis、lib/ARC、lib/LoopTransforms 以及 lib/Transforms 中实现）负责对程序执行额外的高级且专用于 Swift 的优化，包括（例如）自动引用计数优化、去虚拟化、以及通用的专业化。
+Clang 导入器（在 lib/ClangImporter 中实现）负责导入 Clang 模块，并将导出的 C 或 Objective-C API 映射到相应的 Swift API 中。最终导入的 AST 可以被语义分析引用。
 
-**LLVM IR 生成（LLVM IR Generation）**：IR 生成阶段（在 lib/IRGen 中实现）将 SIL 弱化为 LLVM LR，此时 LLVM 可以继续优化并生成机器码。
+**SIL 生成（SIL Generation）**
+
+Swift 中间语言（Swift Intermediate Language，SIL）是一门高级且专用于 Swift 的中间语言，适用于对 Swift 代码的进一步分析和优化。SIL 生成阶段（在 lib/SILGen 中实现）将经过类型检查的 AST 弱化为所谓的「原始」SIL。SIL 的设计在 docs/SIL.rst 有所描述。
+
+**SIL 保证转换（SIL Guaranteed Transformations）**
+
+SIL 保证转换阶段（在 lib/SILOptimizer/Mandatory中实现）负责执行额外且影响程序正确性的数据流诊断（比如使用未初始化的变量）。这些转换的最终结果是「规范」SIL。
+
+**SIL 优化（SIL Optimizations）**
+
+SIL 优化阶段（在 lib/Analysis、lib/ARC、lib/LoopTransforms 以及 lib/Transforms 中实现）负责对程序执行额外的高级且专用于 Swift 的优化，包括（例如）自动引用计数优化、去虚拟化、以及通用的专业化。
+
+**LLVM IR 生成（LLVM IR Generation）**
+
+IR 生成阶段（在 lib/IRGen 中实现）将 SIL 弱化为 LLVM LR，此时 LLVM 可以继续优化并生成机器码。
 
 ### 3.2 编译过程
 
