@@ -15,30 +15,37 @@
 ## iOS
 
 ### SDK
-- [xcodebuild](IOS/Xcodebuild.md)
-- [Layout](IOS/Layout.md)
-- [AutoLayout](IOS/AutoLayout.md)
-- [GCD](IOS/GCD.md)
-- [锁和原子操作](IOS/Lock.md)
-- [Runloop](IOS/Runloop.md) 待完善
-- [Runtime](IOS/Runtime.md)
-- [文件管理](IOS/FileManager.md)
-- [JavaScriptCore框架分析及应用](IOS/JSCore.md)
-- [WKWebView中JavaScript跟Native通信](IOS/JSInteraction.md)
-- [Web资源本地化](IOS/WebLocalized.md)
-- [单元测试](IOS/UnitTesting.md)
+
+- [Layout](IOS/SDK/Layout.md)
+- [AutoLayout](IOS/SDK/AutoLayout.md)
+- [GCD](IOS/SDK/GCD.md)
+- [锁和原子操作](IOS/SDK/Lock.md)
+- [Runloop](IOS/SDK/Runloop.md) 待完善
+- [Runtime](IOS/SDK/Runtime.md)
+- [文件管理](IOS/SDK/FileManager.md)
+- [JavaScriptCore框架分析及应用](IOS/SDK/JSCore.md)
+- [WKWebView中JavaScript跟Native通信](IOS/SDK/JSInteraction.md)
+- [Web资源本地化](IOS/SDK/WebLocalized.md)
+
+### 测试
+
+- [单元测试](IOS/Testing/UnitTesting.md)
+
+### 工具
+
+- [xcodebuild](IOS/Tools/Xcodebuild.md)
 
 ### 架构
 
-- [VIPER架构](IOS/VIPER)
+- [VIPER架构](IOS/Architecture/VIPER.md)
 
 ### 代码库
 
-- [字符串扩展](Tools/StringExtension.swift)
+- [字符串扩展](IOS/Code/StringExtension.swift)
 	- 获取指定类型的字符串
 	- 根据颜色编码产生 `UIColor` 实例
-- [验证码产生器](Tools/CaptchaView.swift)
-- [控制台](Tools/Console.swift)
+- [验证码产生器](IOS/Code/CaptchaView.swift)
+- [控制台](IOS/Code/Console.swift)
 
 ## 语言
 
