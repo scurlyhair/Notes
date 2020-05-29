@@ -6,6 +6,8 @@
 - [编码](Basics/Encoding.md)
 - [正则表达式学习](https://www.jb51.net/tools/zhengze.html)
 - [Socket](Basics/Socket.md)
+- [DNS](Basics/DNS.md)
+
 ## Web
 
 - [同源和跨域](Web/Origin.md)
@@ -26,7 +28,7 @@
 - [Web资源本地化](IOS/WebLocalized.md)
 - [单元测试](IOS/UnitTesting.md)
 
-### 工具库
+### 代码库
 
 - [字符串扩展](Tools/StringExtension.swift)
 	- 获取指定类型的字符串
@@ -52,4 +54,4 @@
 
 ## 编程工具
 
-- [Homebrew](DeveloperTools/Homebrew.md)
+[Homebrew](DeveloperTools/Homebrew.md)
