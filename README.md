@@ -28,6 +28,10 @@
 - [Web资源本地化](IOS/WebLocalized.md)
 - [单元测试](IOS/UnitTesting.md)
 
+### 架构
+
+- [VIPER架构](IOS/VIPER)
+
 ### 代码库
 
 - [字符串扩展](Tools/StringExtension.swift)
@@ -54,4 +58,5 @@
 
 ## 编程工具
 
-[Homebrew](DeveloperTools/Homebrew.md)
+- [Homebrew](DeveloperTools/Homebrew.md)
+- [UML](DeveloperTools/UML.md)
