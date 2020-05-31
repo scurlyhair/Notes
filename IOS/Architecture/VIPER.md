@@ -100,7 +100,7 @@ Presenter 跟其它组件的交互最多，负责将视图、路由、业务整�
 
 
 
-### ViewController
+### View
 
 View 包括 UIViewController 和 UIView 的派生类。主要是 ViewController 跟其他组件进行交互。
 
@@ -209,7 +209,7 @@ self.listWireframe = listWireframe;
 
 > 而 View 是在真正进行路由跳转的时候才实例化。
 
-### 总结
+### 小结
 
 Presenter 和 Interactor 之间通过协议实现低耦合。
 
