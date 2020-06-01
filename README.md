@@ -1,5 +1,6 @@
 # 归档
-对已知知识点进行整理和归档，构建知识框架。
+
+整理和归档，构建知识框架。
 
 ## 计算机基础
 
@@ -51,7 +52,7 @@
 ## 语言
 
 - [Swift](Language/Swift.md)
-- [Swift编译器](Language/SwiftCompiler.md)
+- [Swift编译](Language/SwiftCompilation.md)
 - [构建 Swift 编译工具](https://www.polidea.com/blog/how-to-build-swift-compiler-based-tool-the-step-by-step-guide/)
 - [代码生成](Language/SwiftCodeGenerate.md)
 
@@ -72,7 +73,7 @@
 ## 网站类工具
 
 - 算法学习刷题 [leetcode.com](https://leetcode.com)
-- Free-used高清图片 [https://unsplash.com/](https://unsplash.com/)
+- Free-use 高清图片 [https://unsplash.com/](https://unsplash.com/)
 - 通过URL参数随机图片 [https://picsum.photos/](https://picsum.photos/)
 - 项目管理跟踪 [https://www.atlassian.com/software/jira](https://www.atlassian.com/software/jira)
 - 在线图片压缩 [https://www.picdiet.com/](https://www.picdiet.com/)
