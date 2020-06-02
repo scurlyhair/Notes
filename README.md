@@ -9,6 +9,9 @@
 - [Socket](Basics/Socket.md)
 - [DNS](Basics/DNS.md)
 
+<!--- [二进制、十进制、十六进制]()
+- [基本数据类型及其占用的长度]()-->
+
 ## Web
 
 - [同源和跨域](Web/Origin.md)
@@ -59,7 +62,12 @@
 
 ## 数据结构
 
+- [数组](DataStruct/Array.md)
+- [队列](DataStruct/Queue.md)
+
 [待整理](DataStruct/README.md)
+
+
 
 ## 算法
 
@@ -74,7 +82,7 @@
 
 - 算法学习刷题 [leetcode.com](https://leetcode.com)
 - Free-use 高清图片 [https://unsplash.com/](https://unsplash.com/)
-- 通过URL参数随机图片 [https://picsum.photos/](https://picsum.photos/)
+- 通过URL参数随机获取图片 [https://picsum.photos/](https://picsum.photos/)
 - 项目管理跟踪 [https://www.atlassian.com/software/jira](https://www.atlassian.com/software/jira)
 - 在线图片压缩 [https://www.picdiet.com/](https://www.picdiet.com/)
 - 工具集 [https://www.bejson.com/](https://www.bejson.com/)
