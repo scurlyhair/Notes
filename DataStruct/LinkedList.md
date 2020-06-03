@@ -301,16 +301,6 @@ public func filter(predicate: T -> Bool) -> LinkedList<T> {
 }
 ```
 
+参考链接：
 
-
-
-## 特性
-由于不必须按顺序存储，链表在插入的时候可以达到O(1)的复杂度，比另一种线性表顺序表快得多，但是查找一个节点或者访问特定编号的节点则需要O(n)的时间，而顺序表相应的时间复杂度分别是O(logn)和O(1)。
-
-## 应用
-- 链表用来构建许多其它数据结构，如堆栈，队列和他们的派生
-
-## 拓展
-- 单向链表
-- 双向链表
-- 循环链表
+- [https://github.com/raywenderlich/swift-algorithm-club/tree/master/Linked%20List](https://github.com/raywenderlich/swift-algorithm-club/tree/master/Linked%20List)
