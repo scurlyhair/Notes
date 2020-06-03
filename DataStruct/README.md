@@ -1,6 +1,5 @@
 # 数据结构
 
-- [链表](LinkedList.md)
 - [栈](Stack.md)
 - [堆*](Heap.md)
 - [树](Tree.md)
