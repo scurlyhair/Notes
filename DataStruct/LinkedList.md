@@ -155,7 +155,7 @@ public var count: Int {
 
 有时候我们需要根据索引，获取指定位置的节点：
 
-```
+```swift
 public func node(atIndex index: Int) -> Node {
     if index == 0 {
       return head!
@@ -213,7 +213,7 @@ public func insert(_ node: Node, atIndex index: Int) {
 
 添加移除方法：
 
-```
+```swift
 // 移除所有节点
 public func removeAll() {
     head = nil
