@@ -73,11 +73,11 @@ struct QueueWithArray<T>: Queue {
 > 
 > ```
 > before   [ "Ada", "Steve", "Tim", "Grace", xxx, xxx ]
-                   /       /      /
-                  /       /      /
-                 /       /      /
-                /       /      /
- after   [ "Steve", "Tim", "Grace", xxx, xxx, xxx ]
+>                  /       /      /
+>                 /       /      /
+>                /       /      /
+>               /       /      /
+> after   [ "Steve", "Tim", "Grace", xxx, xxx, xxx ]
 > ```
 
 为了让队列更高效，我们需要对出队操作进行一些调整：在出队方法被调用的时候，我们先不对数组中的第一个元素进行移除操作，而是把她标记为空。
