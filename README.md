@@ -2,20 +2,6 @@
 
 整理和归档，构建知识框架。
 
-## 计算机基础
-
-- [编码](Basics/Encoding.md)
-- [正则表达式学习](https://www.jb51.net/tools/zhengze.html)
-- [Socket](Basics/Socket.md)
-- [DNS](Basics/DNS.md)
-
-<!--- [二进制、十进制、十六进制]()
-- [基本数据类型及其占用的长度]()-->
-
-## Web
-
-- [同源和跨域](Web/Origin.md)
-
 ## iOS
 
 ### SDK
@@ -42,7 +28,8 @@
 ### 架构
 
 - [VIPER架构](IOS/Architecture/VIPER.md)
-- [编码规范](IOS/Architecture/CodingStyle.md) TODO
+<!--- [编码规范](IOS/Architecture/CodingStyle.md) TODO
+-->
 
 ### 代码库
 
@@ -59,6 +46,10 @@
 - [构建 Swift 编译工具](https://www.polidea.com/blog/how-to-build-swift-compiler-based-tool-the-step-by-step-guide/)
 - [代码生成](Language/SwiftCodeGenerate.md)
 
+## Web
+
+- [同源和跨域](Web/Origin.md)
+
 
 ## 数据结构
 
@@ -69,11 +60,19 @@
 
 [待整理](DataStruct/README.md)
 
-
-
 ## 算法
 
 [待整理](Algorithm/README.md)
+
+## 计算机基础
+
+- [编码](Basics/Encoding.md)
+- [正则表达式学习](https://www.jb51.net/tools/zhengze.html)
+- [Socket](Basics/Socket.md)
+- [DNS](Basics/DNS.md)
+
+<!--- [二进制、十进制、十六进制]()
+- [基本数据类型及其占用的长度]()-->
 
 ## 编程工具
 
