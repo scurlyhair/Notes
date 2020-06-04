@@ -1,15 +1,18 @@
-# 堆*
-## 定义
-堆（英语：Heap）是计算机科学中的一种特别的树状数据结构。若是满足以下特性，即可称为堆：“给定堆中任意节点P和C，若P是C的母节点，那么P的值会小于等于（或大于等于）C的值”。若母节点的值恒小于等于子节点的值，此堆称为最小堆（min heap）；反之，若母节点的值恒大于等于子节点的值，此堆称为最大堆（max heap）。在堆中最顶端的那一个节点，称作根节点（root node），根节点本身没有母节点（parent node）。
+# 堆
 
-堆始于J. W. J. Williams在1964年发表的堆排序（heap sort），当时他提出了二叉堆树作为此算法的数据结构。堆在戴克斯特拉算法（英语：Dijkstra's algorithm）中亦为重要的关键。
+堆（Heap）是一种特殊的二叉树。按照特性可以分为最大堆（max-heap）和最小堆（min-heap）两种。
 
-在队列中，调度程序反复提取队列中第一个作业并运行，因为实际情况中某些时间较短的任务将等待很长时间才能结束，或者某些不短小，但具有重要性的作业，同样应当具有优先权。堆即为解决此类问题设计的一种数据结构。
+在最大堆中，父节点的值永远要大于子节点，而最小堆恰恰相反。
 
-## 特性
-- 任意节点小于（或大于）它的所有后裔，最小元（或最大元）在堆的根上（堆序性）
-- 堆总是一棵完全树。即除了最底层，其他层的节点都被元素填满，且最底层尽可能地从左到右填入
+比如下图就是一个最大堆：
 
-## 应用
-- 实现优先队列
-- 堆排序
+![Heap_01](Heap_01.png)
+
+由于堆的这种特性，最大堆根节点永远储存着这棵树中的最大值，而最小值有可能储存在任何一个叶子中。
+
+
+
+参考链接：
+
+- [https://github.com/raywenderlich/swift-algorithm-club/tree/master/Heap](https://github.com/raywenderlich/swift-algorithm-club/tree/master/Heap)
+- [Swift Algorithm Club: Heap and Priority Queue Data Structure](https://www.raywenderlich.com/586-swift-algorithm-club-heap-and-priority-queue-data-structure)
