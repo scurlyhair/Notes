@@ -1,78 +1,154 @@
 # 树
-## 定义
-在计算机科学中，树（英语：tree）是一种抽象数据类型（ADT）或是实现这种抽象数据类型的数据结构，用来模拟具有树状结构性质的数据集合。它是由n（n>0）个有限节点组成一个具有层次关系的集合。把它叫做“树”是因为它看起来像一棵倒挂的树，也就是说它是根朝上，而叶朝下的。
 
-## 特性
-- 每个节点都只有有限个子节点或无子节点
-- 没有父节点的节点称为根节点
-- 每一个非根节点有且只有一个父节点
-- 除了根节点外，每个子节点可以分为多个不相交的子树
-- 树里面没有环路(cycle)
+树（Tree）是一种类似于树状的数据结构，它描述了对象间的层次关系。通过下面这张图我们可以对树有一个直观的认识：
 
-## 应用
+![Tree_01](Tree_01.png)
 
-## 拓展
-### 计算机科学中的树
-- 二叉树
-	- [二叉查找树/二叉搜索树/有序二叉树/排序二叉树](Tree/BinarySearchTree.md)
-	- 笛卡尔树
-- 自平衡二叉查找树
-	- AA树
-	- AVL树
-	- 左倾红黑树
-	- [红黑树](Tree/RedBlackTree.md) ·
-	- 替罪羊树
-	- 伸展树
-	- 树堆
-	- 加权平衡树
-- B树
-	- B+树
-	- 2-3树
-	- 2-3-4树
-	- H树
-- 堆
-	- 二叉堆
-	- 二项堆
-	- 斐波那契堆
-	- 左偏树
-	- 配对堆
-	- 斜堆
-- Trie
-	- 后缀树
-	- 基数树
-	- 三叉查找树
-	- AC自动机
-- 二叉空间分割（BSP）树
-	- 四叉树
-	- 八叉树
-	- k-d树
-- 非二叉树
-	- 指数树
-	- 融合树
-	- 区间树
-- 空间数据分割树
-	- R树
-	- R*树
-	- R+树
-	- 线段树
-	- 可持久化线段树
-- 其他树
-	- 顺序统计树
-	- 树状数组
-	- 哈希树
+从图中可以看到，一棵树是由根（root）、节点（node）和叶子（leaf）构成。
 
+节点是树的基本构成元素。第 0 层节点是根节点，它可以被看做是树的入口。末端节点称为叶子。
 
+下面我们来实现一种最基础、没有任何限制的树。
 
-### 其他
-- 无序树：树中任意节点的子节点之间没有顺序关系，这种树称为无序树，也称为自由树
-- 有序树：树中任意节点的子节点之间有顺序关系，这种树称为有序树
-	- 二叉树：每个节点最多含有两个子树的树称为二叉树
- 		- 完全二叉树：对于一颗二叉树，假设其深度为d（d>1）。除了第d层外，其它各层的节点数目均已达最大值，且第d层所有节点从左向右连续地紧密排列，这样的二叉树被称为完全二叉树
-	 		- 满二叉树：所有叶节点都在最底层的完全二叉树
-	 	- 平衡二叉树：当且仅当任何节点的两棵子树的高度差不大于1的二叉树
-	 	- 排序二叉树：也称二叉搜索树、有序二叉树
-	 - 霍夫曼树：带权路径最短的二叉树称为哈夫曼树或最优二叉树
-	 - B树：一种对读写操作进行优化的自平衡的二叉查找树，能够保持数据有序，拥有多于两个子树
+```swift
+class Node {
+  var value: String
+  var children: [Node] = []
+  weak var parent: Node?
 
-[红黑树](Tree/RedBlackTree.md) · 
-[二叉查找树/二叉搜索树/有序二叉树/排序二叉树](Tree/BinarySearchTree.md)
+  init(value: String) {
+    self.value = value
+  }
+
+  func add(child: Node) {
+    children.append(child)
+    child.parent = self
+  }
+}
+```
+然后通过它构建这样一棵树：
+
+![Tree_02](Tree_02.png)
+
+```swift
+let blackTea = Node(value: "black")
+let greenTea = Node(value: "green")
+let chaiTea = Node(value: "chai")
+
+let soda = Node(value: "soda")
+let milk = Node(value: "milk")
+
+let gingerAle = Node(value: "ginger ale")
+let bitterLemon = Node(value: "bitter lemon")
+
+beverages.add(child: hotBeverage)
+beverages.add(child: coldBeverage)
+
+hotBeverage.add(child: tea)
+hotBeverage.add(child: coffee)
+hotBeverage.add(child: cocoa)
+
+coldBeverage.add(child: soda)
+coldBeverage.add(child: milk)
+
+tea.add(child: blackTea)
+tea.add(child: greenTea)
+tea.add(child: chaiTea)
+
+soda.add(child: gingerAle)
+soda.add(child: bitterLemon)
+```
+
+接下来，我们将对这棵树进行一些探索。
+
+**打印**
+
+如果没有控制台输出，很难对一棵树的内部构造进行验证。因此，在创建了一棵树之后，最好将它在控制台打印出来。
+
+```swift
+print(beverages)
+```
+
+为了能让控制器按照要求打印出树的结构，我们需要让 `Node` 实现 `CustomStringConvertible` 协议：
+
+```swift
+extension Node: CustomStringConvertible {
+  var description: String {
+    var text = "\(value)"
+    if !children.isEmpty {
+      text += " {" + children.map { $0.description }.joined(separator: ", ") + "} "
+    }
+    return text
+  }
+}
+```
+这样我们让节点以递归的方式将其本身和它的孩子节点、孩子的孩子节点等归属于它的所有节点组合打印:
+
+```swift
+"beverages {hot {tea {black, green, chai} , coffee, cocoa} , cold {soda {ginger ale, bitter lemon} , milk} } \n"
+```
+
+**搜索**
+
+假如我们需要知道一棵树中是否包含特定的值，那么我们需要给让其节点实现搜索方法：
+
+```swift
+extension Node {
+  func search(value: String) -> Node? {
+    if value == self.value {
+      return self
+    }
+    for child in children {
+      if let found = child.search(value: value) {
+        return found
+      }
+    }
+    return nil
+  }
+}
+```
+
+**泛化**
+
+之前定义的节点只支持储存 `String` 类型的值，现在，我们将其泛化以支持更多的类型。由于 Swift 对泛型的支持，很容易实现：
+
+```swift
+class Node<T> {
+
+  var value: T
+  weak var parent: Node?
+  var children: [Node] = []
+  
+  init(value: T) {
+    self.value = value
+  }
+  
+  func add(child: Node) {
+    children.append(child)
+    child.parent = self
+  }
+}
+```
+
+同时也需要对搜索函数也支持泛型：
+
+```swift
+extension Node where T: Equatable {
+
+  func search(value: T) -> Node? {
+    if value == self.value {
+      return self
+    }
+    for child in children {
+      if let found = child.search(value: value) {
+        return found
+      }
+    }
+    return nil
+  }
+}
+```
+
+参考链接：
+
+- [Swift Algorithm Club: Swift Tree Data Structure](https://www.raywenderlich.com/1053-swift-algorithm-club-swift-tree-data-structure)

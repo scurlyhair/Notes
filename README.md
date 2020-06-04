@@ -57,6 +57,8 @@
 - [链表](DataStruct/LinkedList.md)
 - [队列](DataStruct/Queue.md)
 - [栈](DataStruct/Stack.md)
+- [树](DataStruct/Tree.md)
+
 
 [待整理](DataStruct/README.md)
 
