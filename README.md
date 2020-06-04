@@ -65,6 +65,7 @@
 - [数组](DataStruct/Array.md)
 - [链表](DataStruct/LinkedList.md)
 - [队列](DataStruct/Queue.md)
+- [栈](DataStruct/Stack.md)
 
 [待整理](DataStruct/README.md)
 
