@@ -56,7 +56,7 @@
 - [队列](DataStruct/Queue.md)
 - [栈](DataStruct/Stack.md)
 - [树](DataStruct/Tree.md)
-- [堆*](DataStruct/Heap.md)
+- [堆](DataStruct/Heap.md)
 
 
 [待整理](DataStruct/README.md)
@@ -79,6 +79,7 @@
 
 - [Homebrew](DeveloperTools/Homebrew.md)
 - [UML](DeveloperTools/UML.md)
+- [VPS+V2Ray](DeveloperTools/VPS_V2Ray.md)
 
 ## 网站类工具
 
