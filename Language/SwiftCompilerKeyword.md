@@ -2,7 +2,7 @@
 
 Swift 一些以 _@_ 开头的关键字用于给编译器标记一些特殊指令。
 
-**@inline**
+### @inline
 
 `@inline` 是函数内联指令，包括：
 
@@ -38,7 +38,7 @@ func methodA() {
 - [The Forbidden @inline Attribute in Swift](https://swiftrocks.com/the-forbidden-inline-attribute-in-swift)
 
 
-**@discardableResult**
+### @discardableResult
 
 `@discardableResult` 关键字用来消除 _result unused_ 警告。
 
