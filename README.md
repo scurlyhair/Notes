@@ -57,11 +57,10 @@
 - [队列](DataStruct/Queue.md)
 - [栈](DataStruct/Stack.md)
 - [树](DataStruct/Tree.md)
+- [二叉查找树](DataStruct/BinarySearchTree.md)
 - [堆](DataStruct/Heap.md)
+<!--- [优先队列]()-->
 - [散列表](DataStruct/HashTable.md)
-
-
-[待整理](DataStruct/README.md)
 
 ## 算法
 
@@ -76,6 +75,7 @@
 
 <!--- [二进制、十进制、十六进制]()
 - [基本数据类型及其占用的长度]()-->
+
 
 ## 编程工具
 
