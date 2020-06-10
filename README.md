@@ -59,6 +59,7 @@
 - [树](DataStruct/Tree.md)
 - [二叉查找树](DataStruct/BinarySearchTree.md)
 - [AVL树](DataStruct/AVLTree.md)
+- [红黑树](DataStruct/RedBlackTree.md)
 - [堆](DataStruct/Heap.md)
 <!--- [优先队列]()-->
 - [散列表](DataStruct/HashTable.md)
