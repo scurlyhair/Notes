@@ -17,6 +17,8 @@
 
 ### 排序过程
 
+![InsertionSort_01](InsertionSort_01.gif)
+
 插入排序算法有点类似于打扑克牌时，从牌桌上逐一拿起扑克牌然后在手上进行排序的过程：依次从原数组中取出元素，插入到另一个数组中，并使这个数组保持有序，直到原数组中的所有元素都被取出。 这也就是被成为插入排序的原因。
 
 实际上，并不需要创建一个单独的数组来进行排序。我们只需要将原数组划分成两个部分：已排序和未排序。然后从未排序部分取出数据放入到已排序部分：
@@ -84,3 +86,4 @@ func insertionSort<T>(_ array: [T], _ isOrderBefore: (T, T) -> Bool) -> [T] {
 
 - [维基百科：插入排序](https://zh.wikipedia.org/wiki/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F)
 - [Wikipedia: Insertion sort](https://en.wikipedia.org/wiki/Insertion_sort)
+- [十大经典排序算法（动图演示）](https://www.cnblogs.com/onepixel/p/7674659.html)
