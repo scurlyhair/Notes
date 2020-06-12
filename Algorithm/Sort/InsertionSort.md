@@ -32,7 +32,7 @@
 
 ```swift
 func insertionSort(_ array: [Int]) -> [Int] {
-    guard array.count > 0 else { return array }
+    guard array.count > 1 else { return array }
     
     var newArray = array
     for i in 1..<newArray.count {
@@ -63,7 +63,7 @@ func insertionSort(_ array: [Int]) -> [Int] {
 
 ```swift
 func insertionSort<T>(_ array: [T], _ isOrderBefore: (T, T) -> Bool) -> [T] {
-    guard array.count > 0 else { return array }
+    guard array.count > 1 else { return array }
     
     var newArray = array
     for i in 1..<newArray.count {
