@@ -69,11 +69,10 @@
 ### 排序
 
 - [常见排序算法](Algorithm/Sort/Sort.md)
-- [插入排序](Algorithm/Sort/InsertionSort.md)
-- [选择排序](Algorithm/Sort/SelectionSort.md)
 - [冒泡排序](Algorithm/Sort/BubbleSort.md)
-
-[待整理](Algorithm/README.md)
+- [选择排序](Algorithm/Sort/SelectionSort.md)
+- [插入排序](Algorithm/Sort/InsertionSort.md)
+- [希尔排序](Algorithm/Sort/ShellSort.md)
 
 ## 计算机基础
 
