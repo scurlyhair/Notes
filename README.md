@@ -71,6 +71,7 @@
 - [常见排序算法](Algorithm/Sort/Sort.md)
 - [插入排序](Algorithm/Sort/InsertionSort.md)
 - [选择排序](Algorithm/Sort/SelectionSort.md)
+- [冒泡排序](Algorithm/Sort/Buble)
 
 [待整理](Algorithm/README.md)
 
