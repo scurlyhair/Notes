@@ -62,7 +62,7 @@ func insertionSort(_ array: [Int]) -> [Int] {
 ### 泛化
 
 ```swift
-func insertionSort<T>(_ array: [T], _ isOrderBefore: (T, T) -> Bool) -> [T] {
+func insertionSort<T>(_ array: [T], _ orderCriteria: (T, T) -> Bool) -> [T] {
     guard array.count > 1 else { return array }
     
     var newArray = array
@@ -71,7 +71,7 @@ func insertionSort<T>(_ array: [T], _ isOrderBefore: (T, T) -> Bool) -> [T] {
         var preIndex = i - 1
         let current = newArray[i]
         
-        while preIndex >= 0 &&  isOrderBefore(current, newArray[preIndex]) {
+        while preIndex >= 0 &&  orderCriteria(current, newArray[preIndex]) {
             newArray[preIndex + 1] = newArray[preIndex]
             preIndex -= 1
         }

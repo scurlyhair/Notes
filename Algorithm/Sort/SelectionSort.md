@@ -2,7 +2,7 @@
 
 ### 性能分析
 
-插入排序的最好、最坏、平均时间复杂度都是 O(n^2)。
+选择排序的最好、最坏、平均时间复杂度都是 O(n^2)。
 
 ### 适用场景
 
@@ -54,7 +54,7 @@ func selectionSort(_ array: [Int]) -> [Int] {
 ### 泛化
 
 ```swift
-func selectionSort<T>(_ array: [T], _ isOrderBefore: (T, T) -> Bool) -> [T] {
+func selectionSort<T>(_ array: [T], _ orderCriteria: (T, T) -> Bool) -> [T] {
     guard array.count > 1 else { return array }
     
     var newArray = array
@@ -64,7 +64,7 @@ func selectionSort<T>(_ array: [T], _ isOrderBefore: (T, T) -> Bool) -> [T] {
         var minIndex = i
         
         for j in i + 1 ..< newArray.count {
-            if isOrderBefore(newArray[j], newArray[minIndex]) {
+            if orderCriteria(newArray[j], newArray[minIndex]) {
                 minIndex = j
             }
         }
