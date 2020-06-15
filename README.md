@@ -73,6 +73,7 @@
 - [选择排序](Algorithm/Sort/SelectionSort.md)
 - [插入排序](Algorithm/Sort/InsertionSort.md)
 - [希尔排序](Algorithm/Sort/ShellSort.md)
+- [归并排序](Algorithm/Sort/MergeSort.md)
 
 ## 计算机基础
 
