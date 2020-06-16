@@ -76,7 +76,8 @@
 - [归并排序](Algorithm/Sort/MergeSort.md)
 - [快速排序](Algorithm/Sort/QuickSort.md)
 - [堆排序](Algorithm/Sort/HeapSort.md)
-- [计数排序](Algotithm/Sort/CountingSort.md)
+- [计数排序](Algorithm/Sort/CountingSort.md)
+- [桶排序](Algorithm/Sort/BucketSort.md)
 
 ## 计算机基础
 
