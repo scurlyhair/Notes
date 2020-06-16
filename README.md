@@ -78,6 +78,7 @@
 - [堆排序](Algorithm/Sort/HeapSort.md)
 - [计数排序](Algorithm/Sort/CountingSort.md)
 - [桶排序](Algorithm/Sort/BucketSort.md)
+- [基数排序](Algorithm/Sort/RadixSort.md)
 
 ## 计算机基础
 
