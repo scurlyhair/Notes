@@ -75,6 +75,7 @@
 - [希尔排序](Algorithm/Sort/ShellSort.md)
 - [归并排序](Algorithm/Sort/MergeSort.md)
 - [快速排序](Algorithm/Sort/QuickSort.md)
+- [堆排序](Algorithm/Sort/HeapSort.md)
 
 ## 计算机基础
 
