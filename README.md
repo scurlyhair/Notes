@@ -80,6 +80,10 @@
 - [桶排序](Algorithm/Sort/BucketSort.md)
 - [基数排序](Algorithm/Sort/RadixSort.md)
 
+### 查找
+
+- [线性查找](Algorithm/Search/LinearSearch.md)
+
 ## 计算机基础
 
 - [编码](Basics/Encoding.md)
