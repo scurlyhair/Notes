@@ -83,6 +83,7 @@
 ### 查找
 
 - [线性查找](Algorithm/Search/LinearSearch.md)
+- [二分查找](Algorithm/Search/BinarySearch.md)
 
 ## 计算机基础
 
