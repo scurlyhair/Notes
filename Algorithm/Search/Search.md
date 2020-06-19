@@ -121,7 +121,106 @@ func interpolationSearch(_ array: [Int], key: Int) -> Int {
 
 斐波那契查找（Fibonacci Search）也是在二分查找基础上扩展而来的。
 
-斐波那契的搜索的数组长度都是斐波那契数列中的一个元素 n。每次 mid 都在斐波那契数列中的前一个数 F(n-1)的位置。
+**斐波那契数列**
+
+F(0) = 0
+
+F(1) = 1
+
+F(n) = F(n - 1) + F(n - 2) 
+
+这里 n > 1
+
+可以看到斐波那契数列满足如下特征：从第2项开始，每个数都等于前两个数之和。
+
+0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
+
+> 在一些比较老的书籍中，F(0) = 0 被缺省了。
+
+![Search_01](Search_01.png)
+
+斐波那契数列跟**黄金分割**联系非常密切：在斐波那契数列中，F(n)/F(n - 1) 的值随着 n 值增加，会越来越逼近黄金分割 1.680339887498... 。
+
+![Search_02](Search_02.png)
+
+斐波那契查找正是以此为优化依据的。
+
+![Search_03](Search_03.jpeg)
+
+**查找过程**
+
+设 n 为待搜索数组的长度，如果 n 不是斐波那契数列 F 中的元素，就将数组扩容到F(m)，F(m) 是 F 中大于 n 的最小值。
+
+斐波那契数列表示为 F(0) = 0，F(1) = 1，F(k + 2) = F(k + 1) + F(k) 这里 k >= 0。
+
+由于待搜索数组长度 n <= F(m)，因此，k <= m。
+
+1. 如果 m = 0，数组为空，搜索停止，返回 - 1；
+2. k = m，low = 0，high = F(k) - 1，mid = low + (F(k-1) - 1)。
+3. 如果 target = array[mid] 则返回 mid；
+4. 如果 target < array[mid]，high = mid，搜索区间缩小 F(k)，即 k -= 1；
+5. 如果 target > array[mid]，low = mid + 1, 搜索区间缩小为 F(k) - F(k - 1) = F(k - 2)，即 k-= 2;
+6. 重复步骤2、3、4、5。
+
+```
+// 根据待排序数组长度构建斐波那契数列
+extension Array where Element == Int {
+    init(asFibonacciSearch number: Int) {
+        self.init()
+        if number == 0 { return }
+        if number == 1 {
+            self.append(0)
+            self.append(1)
+            return
+        }
+        
+        self.append(0)
+        self.append(1)
+        
+        while self.last! < number {
+            self.append(self.last! + self[self.count - 2])
+        }
+    }
+}
+// 搜索函数
+func fibonacciSearch(_ array: inout [Int], _ target: Int) -> Int {
+    if array.count == 0 { return -1 }
+    if array.count == 1 { return array.last! == target ? 0 : -1 }
+    
+    let fibonacci = Array(asFibonacciSearch: array.count)
+    if fibonacci.last! > array.count {
+        array += Array(repeating: array.last! + 1, count: fibonacci.last! - array.count)
+    }
+    
+    var k = fibonacci.count - 1, low = 0, high = fibonacci[k] - 1
+    
+    while low < high {
+        let mid = low + fibonacci[k - 1]
+        if target == array[mid] {
+            return mid
+        } else if target < array[mid] {
+            high = mid
+            k -= 1
+        } else if target > array[mid] {
+            low = mid
+            k -= 2
+        }
+    }
+    return -1
+}
+```
+
+
+
+
+
+
+
+
+
+参考链接：
+
+- [七大查找算法](https://www.cnblogs.com/maybe2030/p/4715035.html)
 
 
 
