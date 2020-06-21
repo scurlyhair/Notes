@@ -84,6 +84,10 @@
 
 - [常见查找算法](Algorithm/Search/Search.md)
 
+### 其它
+
+- [动态规划](Algorithm/Other/DynamicProgramming.md)
+
 ## 计算机基础
 
 - [编码](Basics/Encoding.md)
