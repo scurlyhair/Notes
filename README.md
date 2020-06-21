@@ -84,6 +84,8 @@
 
 - [常见查找算法](Algorithm/Search/Search.md)
 
+<!--深度优先和广度优先-->
+
 ### 其它
 
 - [动态规划](Algorithm/Other/DynamicProgramming.md)
