@@ -79,7 +79,7 @@ func fibonacciNumber(_ index: Int) -> Int {
 
 动态规划的核心元素有两个：
 
-- 缓存表
+- 缓存表（dp）
 - 状态转移方程
 
 **缓存表**
@@ -116,11 +116,21 @@ f(n) = f(n-1) + f(n-2)
 
 实际上，状态转移方程代表了所有子问题的穷举求解方式，而缓存表将必要的结果记录，优化穷举。
 
-### 爬楼梯
+**一般流程**
 
-我们来看 leetcode 中的爬楼梯问题。
+求解动态规划问题的一般性流程：
 
-[70 爬楼梯](https://leetcode-cn.com/problems/climbing-stairs/)：
+1. 状态定义（设计缓存表 dp）
+2. 列出状态转移方程
+3. 分析边界条件
+
+状态定义最重要的是思路的切入点，即如何对复杂问题进行拆解。第一步完成之后，后面就迎刃而解了。
+
+下面我们通过几个案例体会这种拆解思维。
+
+### 案例一：爬楼梯
+
+[70. 爬楼梯](https://leetcode-cn.com/problems/climbing-stairs/)：
 
 假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
 
@@ -128,17 +138,31 @@ f(n) = f(n-1) + f(n-2)
 
 注意：给定 n 是一个正整数。
 
-**求解**
+示例：
 
-我们用 f(x) 表示爬到第 xx 级台阶的方案数，考虑最后一步可能跨了一级台阶，也可能跨了两级台阶，它意味着爬到第 x 级台阶的方案数是爬到第 x - 1 级台阶的方案数和爬到第 x - 2 级台阶的方案数的和。
+```
+输入： 2
+输出： 2
+解释： 有两种方法可以爬到楼顶。
+1.  1 阶 + 1 阶
+2.  2 阶
+```
 
-很好理解，因为每次只能爬 1 级或 2 级，所以 f(x) 只能从 f(x - 1) 和 f(x - 2) 转移过来，而这里要统计方案总数，我们就需要对这两项的贡献求和。
+**解答**
 
-所以我们得到如下状态转移方程：
+状态定义：
 
-f(x) = f(x - 1) + f(x - 2)
+dp[i] 代表爬到第 i 级台阶的方案数。
 
-下面来考虑边界条件。
+爬到第 i 级台阶的方式有两种：最后一步可能跨了一级台阶，也可能跨了两级台阶。它意味着爬到第 i 级台阶的方案数是爬到第 i - 1 级台阶的方案数和爬到第 i - 2 级台阶的方案数的和。
+
+列出状态转移方程：
+
+```
+f(n) = f(n - 1) + f(n - 2)
+```
+
+考虑边界条件：
 
 - 从 0 级到 0 级，有一种解决方案 f(0) = 1，即不爬
 - 从 0 级到 1 级，有一种解决方案 f(1) = 1，即 1
@@ -147,7 +171,7 @@ f(x) = f(x - 1) + f(x - 2)
 
 可以看到从第 2 级开始已经可以满足状态转移方程式。
 
-显然，这个问题最终抽象为类似我们上面的案例：斐波那契数列。只不过边界是从 1 开始。
+显然，这个问题最终抽象为类似我们上面的案例：斐波那契数列。只不过边界取值是从 1 开始。
 
 ```swift
 func climbStairs(_ n: Int) -> Int {
@@ -163,12 +187,84 @@ func climbStairs(_ n: Int) -> Int {
 }
 ```
 
+### 案例二：连续子数组的最大和
 
-### 最优子结构
+[剑指 Offer 42. 连续子数组的最大和](https://leetcode-cn.com/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/)
 
-动态规划常被用于求最值。因此要求问题具有最优子结构。
+输入一个整型数组，数组里有正数也有负数。数组中的一个或连续多个整数组成一个子数组。求所有子数组的和的最大值。
+
+要求时间复杂度为O(n)。
+
+示例：
+
+```
+输入: nums = [-2,1,-3,4,-1,2,1,-5,4]
+输出: 6
+解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
+```
+
+**解答**
+
+状态定义：
+
+设 dp[i] 代表以元素 numbers[i] 结尾的连续子数组的最大和。
+
+dp[i] 可以看做 dp[i-1] + numbers[i]，如果 dp[i-1] <= 0 时，会对 dp[i] 起负作用。
+
+列出状态转义方程：
+
+```
+当 dp[i-1] <= 0， dp[i] = numbers[i]
+当 dp[i-1] > 0， dp[i] = dp[i-1] + numbers[i]
+```
+
+分析边界：
+
+dp[0] = numbers[0]
+
+```swift
+func maxSum(_ numbers: [Int]) -> Int? {
+    if numbers.count == 0 { return nil }
+    if numbers.count == 1 { return numbers.last! }
+    
+    var cache = Array(repeating: numbers.first!, count: numbers.count)
+    var maxValue = numbers[0]
+    for i in 1..<numbers.count {
+        if cache[i - 1] <= 0 {
+            cache[i] = numbers[i]
+        } else {
+            cache[i] = cache[i - 1] + numbers[i]
+        }
+        maxValue = max(maxValue, cache[i])
+    }
+    return maxValue
+}
+```
+
+优化缓存表：
+
+```swift
+func maxSum(_ numbers: [Int]) -> Int? {
+    if numbers.count == 0 { return nil }
+    if numbers.count == 1 { return numbers.last! }
+    
+    var pre = numbers.first!, current = 0
+    var maxValue = numbers[0]
+    for i in 1..<numbers.count {
+        if pre <= 0 {
+            current = numbers[i]
+        } else {
+            current = pre + numbers[i]
+        }
+        pre = current
+        maxValue = max(maxValue, current)
+    }
+    return maxValue
+}
+```
 
 
+### 背包问题
 
 
 
@@ -186,3 +282,4 @@ func climbStairs(_ n: Int) -> Int {
 
 - [维基百科：动态规划](https://zh.wikipedia.org/wiki/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92)
 - [https://labuladong.gitbook.io/algo/dong-tai-gui-hua-xi-lie/dong-tai-gui-hua-xiang-jie-jin-jie](https://labuladong.gitbook.io/algo/dong-tai-gui-hua-xi-lie/dong-tai-gui-hua-xiang-jie-jin-jie)
+- [https://leetcode-cn.com/problems/coin-lcci/solution/bei-bao-jiu-jiang-ge-ren-yi-jian-da-jia-fen-xiang-/](https://leetcode-cn.com/problems/coin-lcci/solution/bei-bao-jiu-jiang-ge-ren-yi-jian-da-jia-fen-xiang-/)
