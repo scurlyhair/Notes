@@ -264,20 +264,6 @@ func maxSum(_ numbers: [Int]) -> Int? {
 ```
 
 
-### 背包问题
-
-
-
-
-
-
-
-
-
-
-
-
-
 参考链接：
 
 - [维基百科：动态规划](https://zh.wikipedia.org/wiki/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92)
