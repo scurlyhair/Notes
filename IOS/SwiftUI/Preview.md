@@ -1,5 +1,27 @@
 # Preview
 
+组织多个 Preview 有两种方式：
+
+```swift
+// Method A:
+ForEach(["iPhone XS", "iPhone SE"], id: \.self) {
+    ContentView()
+        .previewDevice(PreviewDevice(rawValue: $0))
+        .previewDisplayName($0)
+}
+
+// Method B:
+Group {
+    ContentView()
+        .previewDevice(PreviewDevice(rawValue: "iPhone XS"))
+        .previewDisplayName("iPhone XS")
+    
+    ContentView()
+        .previewDevice(PreviewDevice(rawValue: "iPhone SE"))
+        .previewDisplayName("iPhone SE")
+}
+```
+
 SwiftUI Preview Device Type
 
 ```
