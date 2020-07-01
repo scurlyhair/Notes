@@ -41,6 +41,7 @@
 ## 语言
 
 - [Swift](Language/Swift.md)
+<!--- [SwiftKeyPaths](Language/SwiftKeyPaths.md)-->
 - [Swift编译指令关键字](Language/SwiftCompilerKeyword.md)
 - [Swift编译](Language/SwiftCompilation.md)
 - [构建 Swift 编译工具](https://www.polidea.com/blog/how-to-build-swift-compiler-based-tool-the-step-by-step-guide/)
