@@ -1,6 +1,6 @@
 # 关键字
 
-**@Environment**
+### @Environment
 
 `@Environment` 是一个属性转换器（PropertyWraper），借由 `KeyPath` 进行环境变量的读写：
 
@@ -19,7 +19,7 @@ Text("")
 
 当然我们也可以自定义一些 `EnvironmentValues`：
 
-```
+```swift
 struct Custom {
     
 }
@@ -40,7 +40,7 @@ extension EnvironmentValues {
 }
 ```
 
-**@EnvironmentObject**
+### @EnvironmentObject
 
 借助于 `@EnvironmentObject` 我们可以将自定义对象添加到环境中，并在任意 View 中进行读写。可以简单地将它看做是全局的 `ObservableObject`，值改变时会触发相关 View 重新渲染。
 
@@ -72,7 +72,7 @@ window.rootViewController = UIHostingController(rootView:  root)
 ContentView().environmentObject(UserSettings())
 ```
 
-**@State**
+### @State
 
 SwiftUI 中的 View 是结构体，而结构体是值类型的，在程序运行中，可能会被多次销毁和创建。 `@State` 修饰符会把修饰的属性交给 SwiftUI 进行管理，在销毁和创建的时候不会丢失。
 
