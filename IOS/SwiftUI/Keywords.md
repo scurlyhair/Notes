@@ -42,7 +42,7 @@ extension EnvironmentValues {
 
 **@EnvironmentObject**
 
-借助于 `@EnvironmentObject` 我们可以将自定义对象添加到环境中，并在任意 View 中进行读写。可以简单地将它看做是全局的 `ObservableObject`。
+借助于 `@EnvironmentObject` 我们可以将自定义对象添加到环境中，并在任意 View 中进行读写。可以简单地将它看做是全局的 `ObservableObject`，值改变时会触发相关 View 重新渲染。
 
 Environment Object 必须保证在使用之前被添加，否则程序将 Crash，因此一般在根视图中将其添加：
 
