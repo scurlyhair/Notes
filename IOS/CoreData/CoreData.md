@@ -7,9 +7,9 @@ CoreData 是基于 ORM（Object-Relation-Mapping）的数据持久化框架。
 CoreData 的核心元素如下：
 
 - **store** 数据实际储存的文件
-- **scheme** 数据实体的属性以及相互间的关系
+- **objectModel** 数据实体的属性以及相互间的关系
 - **context** 数据操作的执行环境
-- **obj** 数据对象
+- **object** 数据对象
 - **coordinator** 管理 store
 
 它们对应的抽象类如下：
@@ -18,17 +18,19 @@ CoreData 的核心元素如下：
 1. store - NSPersistentStore
 代表储存文件的抽象类，文件是SQLite、XML、Binary等类型。
 
-2. scheme - NSManagedObjectModel
-代表实体及实体关系的描述文件的抽象类， 即`example.xcdatamodeld`文件，而此文件最终会被编译为 `example.momd`
+2. objectModel - NSManagedObjectModel
+代表实体及实体关系的描述文件的抽象类
+- example.xcdatamodeld 文件，而此文件最终会被编译为 example.momd
+- example.xcdatamodel 文件，而此文件最终会被编译为 example.mom
 
 3. context - NSManagedObjectContext 
 操作数据对象的上下文环境
 
-4. obj - NSManagedObject
+4. object - NSManagedObject
 数据对象
 
 5. coordinator - NSPersistentStoreCoordinator
-- 关联 store 和 scheme
+- 关联 store 和 objectModel
 - 整合多个 store 并向 context 提供通用的接口
 ```
 

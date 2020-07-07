@@ -10,6 +10,7 @@
 ### CoreData
 
 - [CoreData](IOS/CoreData/CoreData.md)
+- [CoreDataStack](IOS/CoreData/CoreDataStack.md)
 - [多个 store](IOS/CoreData/MultipleStore.md)
 
 ### SDK
