@@ -71,7 +71,7 @@ if context.hasChanges {
 
 **另外**：
 
-在 iOS10 以上的版本苹果提供 `NSPersistentContainer` 类来简化 stack 的创建：
+在 iOS10 以上的版本苹果引入 `NSPersistentContainer` 类来简化 stack 的创建：
 
 ```swift
 let container = NSPersistentContainer(name: "Example")
@@ -98,7 +98,6 @@ container.performBackgroundTask { (NSManagedObjectContext) in
 }
 ```
 
+对于多个 store，苹果引入了一个 `NSPersistentStoreDescription` 类来描述 store 的特性。
 
-
-
-
+我们可以通过给 container 添加多个 store description 然后调用 `loadPersistentStores` 函数来实现。
