@@ -11,6 +11,7 @@
 
 - [CoreData](IOS/CoreData/CoreData.md)
 - [CoreDataStack](IOS/CoreData/CoreDataStack.md)
+- [基本使用](IOS/CoreData/BasicUse.md)
 - [多个 store](IOS/CoreData/MultipleStore.md)
 
 ### SDK
