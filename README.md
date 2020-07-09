@@ -106,6 +106,7 @@
 
 ## 计算机基础
 
+- [数据的表示](Basic/DataRepresentation.md)
 - [编码](Basics/Encoding.md)
 - [正则表达式学习](https://www.jb51.net/tools/zhengze.html)
 - [Socket](Basics/Socket.md)
