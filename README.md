@@ -18,6 +18,7 @@
 ### SDK
 
 <!--- [Combine](IOS/SDK/Combine.md)-->
+- [Socket Streams](IOS/SDK/SocketStreams.md)
 - [Layout](IOS/SDK/Layout.md)
 - [AutoLayout](IOS/SDK/AutoLayout.md)
 - [GCD](IOS/SDK/GCD.md)
