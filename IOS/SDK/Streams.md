@@ -51,7 +51,7 @@ class Reader: NSObject {
     }
 }
 
-extension DataReader: StreamDelegate {
+extension Reader: StreamDelegate {
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
         // 2 - 进行事件处理
         switch eventCode {
@@ -107,6 +107,153 @@ guard let data = outputStream.property(forKey: .dataWrittenToMemoryStreamKey) as
 let string = String(data: data, encoding: .utf8)
 ```
 
+完整代码：
+
+```swift
+class Writer: NSObject {
+    private var outputStream: OutputStream?
+    private var target: Data?
+    private var source: Data?
+    private let maxWriteLength: Int = 10
+
+    func write(to target: Data, with source: Data) {
+        self.target = target
+        self.source = source
+
+        // 1 - 初始化 stream
+        outputStream = OutputStream(toMemory: ())
+        // 2 - 设置代理
+        outputStream?.delegate = self
+        // 3 - 添加到 run loop
+        outputStream?.schedule(in: .current, forMode: .common)
+        // 4 - 打开 stream
+        outputStream?.open()
+    }
+}
+
+extension Writer: StreamDelegate {
+    func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
+        // 2 - 处理事件
+        switch eventCode {
+        case .hasSpaceAvailable:
+            // 5 - 向 stream 写入数据
+            writeBytesToStream()
+        default:
+            // handle other case
+            break
+        }
+    }
+
+    private func writeBytesToStream() {
+        guard source != nil, source!.count > 0 else {
+            // 6 - 写入完成关闭 stream
+            outputStream?.close()
+            outputStream?.remove(from: .current, forMode: .common)
+            outputStream = nil
+            return
+        }
+
+        let dropLength = min(source!.count, maxWriteLength)
+        _ = source!.withUnsafeBytes { (rawBufferPointer: UnsafeRawBufferPointer) -> Int in
+            guard let outputStream = outputStream,
+                let bufferPointer = rawBufferPointer.bindMemory(to: UInt8.self).baseAddress else {
+                return -1
+            }
+            return outputStream.write(bufferPointer, maxLength: dropLength)
+        }
+        source = source!.dropFirst(dropLength)
+    }
+}
+```
+
+## Socket Streams
+
+Stream 也可以跟 Socket 配合使用，建立起跟远端主机之间的 socket 通信。
+
+值得注意的是，Cocoa 提供的 `Stream` 类并不支持这样做，但是 Core Foundation 提供了 `CFStream` 的 socket 实现。基于此，我们可以通过他们两个混合使用来完成这个任务。
+
+Socket Streams 跟文件读写的重要区别在于 input-stream 和 output-stream 的初始化过程以及 output-stream 的写入时机。
+
+```swift
+class SocketStreamManager: NSObject {
+    // 1
+    var inputStream: InputStream?
+    var outputStream: OutputStream?
+    
+    /// 建立会话
+    func setupNetworkCommunication() {
+        // 1
+        var readStream: Unmanaged<CFReadStream>?
+        var writeStream: Unmanaged<CFWriteStream>?
+        
+        // 2
+        CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault,
+                                           "localhost" as CFString,
+                                           80,
+                                           &readStream,
+                                           &writeStream)
+        
+        inputStream = readStream!.takeRetainedValue()
+        outputStream = writeStream!.takeRetainedValue()
+        
+        //
+        inputStream?.delegate = self
+        
+        inputStream?.schedule(in: .current, forMode: .common)
+        outputStream?.schedule(in: .current, forMode: .common)
+        
+        inputStream?.open()
+        outputStream?.open()
+    }
+    
+    /// 发送消息
+    func send(message: String) {
+        guard let data = message.data(using: .utf8) else { return }
+        
+        _ = data.withUnsafeBytes {
+            guard let pointer = $0.baseAddress?.assumingMemoryBound(to: UInt8.self) else {
+                print("Error joining chat")
+                return
+            }
+            outputStream?.write(pointer, maxLength: data.count)
+        }
+    }
+    
+    /// 停止会话
+    func stopChatSession() {
+        inputStream?.close()
+        inputStream?.remove(from: .current, forMode: .common)
+        inputStream = nil
+        
+        outputStream?.close()
+        outputStream?.remove(from: .current, forMode: .common)
+        outputStream = nil
+    }
+}
+
+extension SocketStreamManager: StreamDelegate {
+    func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
+        switch eventCode {
+        case .hasBytesAvailable:
+            // 处理引用
+            break
+        case .endEncountered:
+            stopChatSession()
+        default:
+            // handle other cases
+            break
+        }
+    }
+}
+```
+
+
+TODO: 
+Stream.Event
+
+
+
 参考链接：
 
 - [Introduction to Stream Programming Guide for Cocoa](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/Streams/Streams.html#//apple_ref/doc/uid/10000188-SW1)
+- [https://www.raywenderlich.com/3437391-real-time-communication-with-streams-tutorial-for-ios](https://www.raywenderlich.com/3437391-real-time-communication-with-streams-tutorial-for-ios)
