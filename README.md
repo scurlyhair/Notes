@@ -117,6 +117,7 @@
 - [正则表达式学习](https://www.jb51.net/tools/zhengze.html)
 - [Socket](Basics/Socket.md)
 - [DNS](Basics/DNS.md)
+- [阮一峰：SSL/TLS协议运行机制的概述](https://www.ruanyifeng.com/blog/2014/02/ssl_tls.html)
 
 <!--- [二进制、十进制、十六进制]()
 - [基本数据类型及其占用的长度]()-->
