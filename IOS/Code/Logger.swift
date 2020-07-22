@@ -1,9 +1,9 @@
 import Foundation
 
 enum Logger {
-    case error(_ message: String)
-    case success(_ message: String)
-    case warning(_ message: String)
+    case error(_ message: String, function: String = #function, file: String = #file, line: Int = #line)
+    case success(_ message: String, function: String = #function, file: String = #file, line: Int = #line)
+    case warning(_ message: String, function: String = #function, file: String = #file, line: Int = #line)
 }
 
 extension Logger {
@@ -15,13 +15,15 @@ extension Logger {
     }
 
     private var info: String {
-        let location = "\(#function) in \(#file.components(separatedBy: "/").last ?? "unknown file"):\(#line)"
         switch self {
-        case let .error(message):
+        case let .error(message, function, file, line):
+            let location = "\(function) in \(file.components(separatedBy: "/").last ?? "unknown file"):\(line)"
             return "❌ Error: \(message)\n at \(location)"
-        case let .success(message):
+        case let .success(message, function, file, line):
+            let location = "\(function) in \(file.components(separatedBy: "/").last ?? "unknown file"):\(line)"
             return "✅ Success: \(message)\n at \(location)"
-        case let .warning(message):
+        case let .warning(message, function, file, line):
+            let location = "\(function) in \(file.components(separatedBy: "/").last ?? "unknown file"):\(line)"
             return "⚠️ Warning: \(message)\n at \(location)"
         }
     }
