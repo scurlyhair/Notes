@@ -166,9 +166,24 @@ extension UILayoutPriority {
 
 ## 实现方案
 
+
 ### NSLayoutConstraint
 ### VFL
 ### Interface Builder
+### AutoLayout Anchors
+
+```swift
+let margins = view.layoutMarginsGuide
+
+view.addSubview(closeBtn)
+closeBtn.translatesAutoresizingMaskIntoConstraints = false
+NSLayoutConstraint.activate([
+    closeBtn.topAnchor.constraint(equalTo: margins.topAnchor, constant: 5),
+    closeBtn.rightAnchor.constraint(equalTo: margins.rightAnchor),
+    closeBtn.heightAnchor.constraint(equalToConstant: 40)
+])
+```
+
 ### Masonry/SnapKit
 
 
