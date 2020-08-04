@@ -48,6 +48,7 @@
 	- 获取指定类型的字符串
 	- 根据颜色编码产生 `UIColor` 实例
 - [验证码产生器](IOS/Code/CaptchaView.swift)
+- [加密算法](IOS/Code/Crypto.swift)
 
 ## 语言
 
