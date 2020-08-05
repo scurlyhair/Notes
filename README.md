@@ -41,12 +41,14 @@
 <!--- [编码规范](IOS/Architecture/CodingStyle.md) TODO
 -->
 
-### 代码库
+### 代码
 
 - [Logger](IOS/Code/Logger.swift)
 - [字符串扩展](IOS/Code/StringExtension.swift)
 	- 获取指定类型的字符串
 	- 根据颜色编码产生 `UIColor` 实例
+- [UIImage扩展](IOS/Code/UIImageExtension.swift)
+	- 向 UIImage 添加文字
 - [验证码产生器](IOS/Code/CaptchaView.swift)
 - [加密算法](IOS/Code/Crypto.swift)
 
