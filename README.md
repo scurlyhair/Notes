@@ -21,7 +21,7 @@
 
 ### 探索
 
-- [队列](IOS/Topics/Queue/Queue.md)
+- [GCD队列](IOS/Topics/GCD/GCD.md)
 - [锁和原子操作](IOS/Topics/Lock/Lock.md)
 - [WKWebView中JavaScript跟Native通信](IOS/Topics/JSInteraction/JSInteraction.md)
 - [Web资源本地化](IOS/Topics/WebLocalized/WebLocalized.md)
