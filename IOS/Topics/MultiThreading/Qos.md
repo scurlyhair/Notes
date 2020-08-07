@@ -29,7 +29,7 @@ Qos 的权重级别、应用场景以及考量标准如下表：
 | Qos 级别 | 描述 |
 | --- | --- |
 | .default | 介于 .initiated 和 .utility 之间，Apple 不鼓励开发者为任务指定此权重，当 qos 缺失时，系统会默认使用这个权重。另外， GCD 的 global queue 的权重级别就是 .default |
-| .unspecified | This represents the absence of QoS information and cues the system that an environmental QoS should be inferred. Threads can have an unspecified QoS if they use legacy APIs that may opt the thread out of QoS. 这个权重代表 Qos 信息的缺失，系统会根据执行环境来进行推断其权重，当任务使用 Qos 的不支持的旧版接口切导致线程退出 Qos 策略时，当前的权重会被标识为 .unspecified |
+| .unspecified | This represents the absence of QoS information and cues the system that an environmental QoS should be inferred. Threads can have an unspecified QoS if they use legacy APIs that may opt the thread out of QoS. <br/>这个权重代表 Qos 信息的缺失，系统会根据执行环境来进行推断其权重，当任务使用 Qos 的不支持的旧版接口切导致线程退出 Qos 策略时，当前的权重会被标识为 .unspecified |
 
 我们可以通过一些耗时的操作来进行验证：
 
@@ -99,11 +99,23 @@ func doSomeWork(withName name: String) {
 
 ## Qos 级别的推断和提升
 
-队列和任务的 qos 级别并非一成不变的，它会随着根据需要进行改变。比如当添加到队列中的任务的 qos 和队列的 qos 不一致时，系统会根据一些规则来进行权重的推断。下表是不同情况下的 qos 推断规则：
+队列和任务的 qos 级别并非一成不变的，它会随着根据需要进行改变。比如当添加到队列中的任务的 qos 和队列的 qos 不一致时，系统会根据一些规则来进行权重的推断。
 
-| 情况 | 结果 |
+**NSOperationQueue**  的 qos 推断和提升规则：
+
+| 情形 | 结果 |
 | --- | --- |
-| 队列没有指定 qos，指定了 qos 的任务被添加到此队列 |
+| 指定了 qos 的任务被添加到未指定 qos 的队列 | 队列和其中的其它任务不受影响 |
+| 指定了 qos 的任务被添加到指定了 qos 的队列 | 1. 如果新入队的任务 qos 更高，则队列的 qos 也会被提升。<br/> 2. 队列中的其它较低权重的任务的 qos 也会被提升。<br/> 3. 未来新加入的较低权重的任务 qos 也会被提升。|
+| 通过修改队列的 `qualityOfService` 属性来提升 qos | 1. 队列中的低权重任务都会被提升。<br/> 2. 未来加入队列的低权重任务的 qos 会被提升。|
+| 通过修改队列（例如 OperationQueue）的 `qualityOfService` 属性来降低 qos | 1. 队列中的任务不会受到影响。<br/> 2. 在未来加入队列的任务，如果指定了 qos 则维持他们的权重级别，如果没有指定，则会被推断为较低的 qos |
+
+**NSOperation** 的 qos 推断和提升规则：
+
+| 情形 | 结果 |
+| --- | --- |
+| 任务未指定 qos | 1. 根据任务的 parent operation, queue, [NSProcessInfo performActivityWithOptions:reason:usingBlock:] block, 或 thread 的 qos 来推断。<br/> 2. 
+
 
 
 
