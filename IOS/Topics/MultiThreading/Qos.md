@@ -6,7 +6,7 @@
 
 作为开发者，我们可以根据需要为任务添加权重，来帮助系统更好地进行资源分配。
 
-Qos（Quality of service）就是 Apple 在 iOS8 引入的一种基于资源分配的权重策略。它可以被应用于 *NSOperation, NSThread, GCD, 和 pthreads (POSIX threads)* 等多线程管理模式中。
+Qos（Quality of service）就是 Apple 在 iOS8 引入的一种基于资源分配的权重策略。它可以被应用于 *NSOperation, NSThread, GCD, 和 pthreads (POSIX threads)* 等多线s程管理模式中。
 
 ## Qos 级别
 
@@ -114,8 +114,21 @@ func doSomeWork(withName name: String) {
 
 | 情形 | 结果 |
 | --- | --- |
-| 任务未指定 qos | 1. 根据任务的 parent operation, queue, [NSProcessInfo performActivityWithOptions:reason:usingBlock:] block, 或 thread 的 qos 来推断。<br/> 2. 
+| 任务未指定 qos | 1. 根据任务的 parent operation, queue, [NSProcessInfo performActivityWithOptions:reason:usingBlock:] block, 或 thread 的 qos 来推断。<br/> 2. 如果任务在主线程创建，则会被推断为 .userInitiated |
+| 指定了 qos 的任务被添加到更高级别 qos 的队列中 | 任务的 qos 会被提升 |
+| 包含任务的队列的 qos 被提升 | 如果队列中的任务的权重较低，则其 qos 会被提升 |
+| 一个任务被指定为另一个任务的子任务 | 如果父任务的权重较低，则其 qos 会被提升 |
+| 通过修改任务的 `qualityOfService` 属性来提升 qos | 1. 其子任务的 qos 也会被提升。<br/> 2. 队列中排在此任务之前的任务 qos 也会被提升。|
+| 通过修改任务的 `qualityOfService` 属性来降低 qos | 1. 其子任务的 qos 不会受影响。<br/> 2. 队列的 qos 不会受影响 |
 
+运行中的 **Operation** qos 的调整
+
+- 修改任务的 `qualityOfService` 属性。通过这种方式修改 qos 也会影响到运行该任务的线程的 qos。
+- 向正在运行的任务队列中添加 qos 更高的任务。这种方式将会提升运行中的任务的 qos。
+- 使用 `addDependency: ` 函数向正在运行的任务添加 qos 更高的子任务。
+- 使用 `waitUntilFinished ` 或者 `waitUntilAllOperationsAreFinished` 函数。这种方式将会提升运行中的任务的 qos 以匹配其调用者的 qos。
+
+**GCD 中的 qos 一旦被指定，就不能再做修改。**
 
 
 
