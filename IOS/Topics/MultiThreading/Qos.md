@@ -28,8 +28,8 @@ Qos 的权重级别、应用场景以及考量标准如下表：
 
 | Qos 级别 | 描述 |
 | --- | --- |
-| .default | 介于 .initiated 和 .utility 之间，Apple 不鼓励开发者为任务指定此权重，当 qos 缺失时，系统会默认使用这个权重。另外， GCD 的 global queue 的权重级别就是 .default |
-| .unspecified | This represents the absence of QoS information and cues the system that an environmental QoS should be inferred. Threads can have an unspecified QoS if they use legacy APIs that may opt the thread out of QoS. <br/>这个权重代表 Qos 信息的缺失，系统会根据执行环境来进行推断其权重，当任务使用 Qos 的不支持的旧版接口切导致线程退出 Qos 策略时，当前的权重会被标识为 .unspecified |
+| .default | 介于 .initiated 和 .utility 之间，Apple 不鼓励开发者为任务指定此权重，当任务的 qos 缺失时，系统会以 default 的标准做处理。另外， GCD 的 global queue 的权重级别就是 .default |
+| .unspecified | This represents the absence of QoS information and cues the system that an environmental QoS should be inferred. Threads can have an unspecified QoS if they use legacy APIs that may opt the thread out of QoS. <br/>这个权重代表 Qos 信息未指定，系统会根据执行环境来进行推断其权重。另外，当任务使用 Qos 的不支持的旧版接口切导致线程退出 Qos 策略时，当前线程的权重也会被标识为 .unspecified |
 
 我们可以通过一些耗时的操作来进行验证：
 
