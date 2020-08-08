@@ -128,7 +128,67 @@ func doSomeWork(withName name: String) {
 - 使用 `addDependency: ` 函数向正在运行的任务添加 qos 更高的子任务。
 - 使用 `waitUntilFinished ` 或者 `waitUntilAllOperationsAreFinished` 函数。这种方式将会提升运行中的任务的 qos 以匹配其调用者的 qos。
 
-**GCD 中的 qos 一旦被指定，就不能再做修改。**
+**GCD 队列的 qos 一旦被指定，就不能再做修改。加入其中的任务都会以此队列的 qos 来执行。**
+
+我们可以将上面的例子做一些修改以做验证：
+
+```swift
+import Foundation
+
+func test(queueQos: DispatchQoS) {
+    let queue = DispatchQueue(label: "concurrent_queue", qos: queueQos, attributes: [.concurrent])
+
+    let work1 = DispatchWorkItem() {
+        doSomeWork(withName: "work 1", queue: queue)
+    }
+    let work2 = DispatchWorkItem() {
+        doSomeWork(withName: "work 2", queue: queue)
+    }
+    let work3 = DispatchWorkItem() {
+        doSomeWork(withName: "work 3", queue: queue)
+    }
+    let work4 = DispatchWorkItem() {
+        doSomeWork(withName: "work 4", queue: queue)
+    }
+    queue.async(execute: work1)
+    queue.async(execute: work2)
+    queue.async(execute: work3)
+    queue.async(execute: work4)
+}
+
+func doSomeWork(withName name: String, queue: DispatchQueue) {
+    print(name, "start", Thread.current, CFAbsoluteTimeGetCurrent())
+    var array: [Int] = []
+    for i in 0..<2000 {
+        array.append(i)
+    }
+    print(name, "done", Thread.current, CFAbsoluteTimeGetCurrent(), queue.qos.qosClass)
+}
+
+test(queueQos: .background)
+test(queueQos: .userInteractive)
+
+/**
+ work 1 start <NSThread: 0x6000000304c0>{number = 4, name = (null)} 618579051.493967
+ work 2 start <NSThread: 0x60000003d2c0>{number = 7, name = (null)} 618579051.493986
+ work 3 start <NSThread: 0x60000003e900>{number = 3, name = (null)} 618579051.494019
+ work 4 start <NSThread: 0x60000000a500>{number = 8, name = (null)} 618579051.494059
+ work 1 start <NSThread: 0x600000031980>{number = 9, name = (null)} 618579051.49427
+ work 2 start <NSThread: 0x600000028640>{number = 10, name = (null)} 618579051.494315
+ work 4 start <NSThread: 0x60000000a540>{number = 12, name = (null)} 618579051.494455
+ work 3 start <NSThread: 0x60000003d280>{number = 11, name = (null)} 618579051.494438
+ 
+ work 4 done <NSThread: 0x60000000a540>{number = 12, name = (null)} 618579054.494546 userInteractive
+ work 3 done <NSThread: 0x60000003d280>{number = 11, name = (null)} 618579054.511157 userInteractive
+ work 2 done <NSThread: 0x600000028640>{number = 10, name = (null)} 618579054.512461 userInteractive
+ work 1 done <NSThread: 0x600000031980>{number = 9, name = (null)} 618579054.514096 userInteractive
+ work 2 done <NSThread: 0x60000003d2c0>{number = 7, name = (null)} 618579055.361108 background
+ work 4 done <NSThread: 0x60000000a500>{number = 8, name = (null)} 618579055.361791 background
+ work 1 done <NSThread: 0x6000000304c0>{number = 4, name = (null)} 618579055.364302 background
+ work 3 done <NSThread: 0x60000003e900>{number = 3, name = (null)} 618579055.365978 background
+ */
+```
+
 
 
 
