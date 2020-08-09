@@ -1,7 +1,12 @@
 import UIKit
 
 extension UIImage {
-    // 向 UIImage 添加文字
+    /// 在图片上写入文字
+    /// - Parameters:
+    ///   - text: 待写入文本
+    ///   - attrs: 文本属性
+    ///   - point: 文本在图片上的起点位置
+    /// - Returns: 成功写入文本的图片
     func textToImage(drawText text: String, withAttributes attrs: [NSAttributedString.Key: Any]? = nil, atPoint point: CGPoint) -> UIImage {
         let scale = UIScreen.main.scale
         UIGraphicsBeginImageContextWithOptions(self.size, false, scale)
