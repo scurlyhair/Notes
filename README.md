@@ -51,6 +51,8 @@
 	- 根据颜色编码产生 `UIColor` 实例
 - [UIImage扩展](IOS/Code/UIImageExtension.swift)
 	- 向 UIImage 添加文字
+- [UIImageView扩展](IOS/Code/UIImageViewExtension.swift)
+	- 从 url 异步加载图片
 - [验证码产生器](IOS/Code/CaptchaView.swift)
 - [加密算法](IOS/Code/Crypto.swift)
 
