@@ -17,16 +17,20 @@ extension UIImageView {
 
         let download = DispatchWorkItem {
             let semaphore = DispatchSemaphore(value: 0)
+            defer {
+                semaphore.wait()
+            }
 
             URLSession.shared.dataTask(with: url) { data, _, error in
+                defer {
+                    semaphore.signal()
+                }
                 if let error = error {
                     print(error.localizedDescription, "image url: \(url.absoluteString)")
                     return
                 }
                 imgData = data
-                semaphore.signal()
             }.resume()
-            semaphore.wait()
         }
 
         let load = DispatchWorkItem(qos: .userInteractive) {
