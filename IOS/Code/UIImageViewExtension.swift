@@ -33,10 +33,10 @@ extension UIImageView {
             }.resume()
         }
 
-        let load = DispatchWorkItem(qos: .userInteractive) {
+        let load = DispatchWorkItem(qos: .userInteractive) {[weak self] in
             guard let data = imgData else { return }
             let img = UIImage(data: data)
-            self.image = img
+            self?.image = img
         }
         download.notify(queue: .main, execute: load)
 
