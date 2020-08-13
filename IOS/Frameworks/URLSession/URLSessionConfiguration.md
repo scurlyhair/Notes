@@ -174,7 +174,7 @@ public enum CachePolicy : UInt {
 
 用来决定何时使用 Cache 来返回相应的 Response。默认值是 useProtocolCachePolicy。
 
-## 后台传输支持
+## 后台传输
 
 ```swift
 var sessionSendsLaunchEvents: Bool { get set }
@@ -183,6 +183,115 @@ var sessionSendsLaunchEvents: Bool { get set }
 当后台下载任务完成时，是否在后台启动或者唤醒 APP。默认值是 true。
 
 当此属性被设置为 true 时，如果后台下载任务完成，系统会在后台自动唤醒或者启动 APP。此时 系统会调用应用程序 APPDelegate中的 application(_:handleEventsForBackgroundURLSession:completionHandler:) 函数。如果应用是被重新启动，你可以使用此函数中提供的 indentifier 创建新的 Session 对象来完成后续任务。
+
+```swift
+var isDiscretionary: Bool { get set }
+```
+
+指定 Background 任务是否可以交由系统进行性能优化。默认是 false。
+
+如果被设置为 true， 系统会根据当前的网络状态和电池状态对网络任务进行调整。比如系统可能会将大文件的下载推迟到设备接入电源或者接入 WiFi 的时候。
+
+> 这个属性只有在应用程序处于 Foreground 时是有效地。换言之，如果程序处于后台或者被杀死，系统会以此属性为 true 的方式，处理这个 Background 网络任务。
+
+```swift
+var shouldUseExtendedBackgroundIdleMode: Bool { get set }
+```
+
+当程序被挂起时，其 TCP 连接是否保持打开。
+
+将此属性设置为 true 来告诉系统推迟程序进入后台后关闭其 TCP 连接的时机。
+
+## 自定义协议
+
+```swift
+var protocolClasses: [AnyClass]? { get set }
+```
+
+用于处理网络请求的额外协议数组。 其元素遵循 URLProtocol。
+
+Session 中的网络请求支持各种常见的网络协议。同时也支持自定义协议。在队请求做预处理的时候，系统会先查找默认协议，然后去查找自定义协议，直到找到能处理指定请求的协议。URLProtocol 的 `class func canInit(with request: URLRequest) -> Bool` 函数用来描述其是否可以处理特定的请求。
+
+> 此属性不会被应用于 Background 模式的请求。
+
+## MPTCP（Multipath TCP）
+
+```swift
+var multipathServiceType: URLSessionConfiguration.MultipathServiceType { get set }
+public enum MultipathServiceType: Int {
+    case none = 0 // 禁用 MPTCP
+    case handover = 1 // WiFi 和蜂窝网络之间的无缝切换
+    case interactive = 2 // MPTCP 优先保证低延迟
+    case aggregate = 3 // 结合其他选项的能力以提高网络吞吐量、降低延迟。
+}
+```
+
+指定使用 WiFi 和 蜂窝网络的多路径 TCP 连接策略。默认值是 none。
+
+Multipath TCP 是 TCP 的扩展，它允许多个接口（wifi/蜂窝网络）去进行同一个网络请求任务的数据传输。这个能力可以在设备从 Wifi 环境变化为蜂窝网络环境的时候，提供网络连接的无缝切换，其目的是为了使两个设备都能以较高的效率工作，以及优化用户体验。
+
+> 在应用程序中使用 MPTP 需要以下几个步骤：
+> 
+> 1. 服务器对 MPTP 的支持。
+> 2. 在程序的 Xcode 工程中的 Capabilities 页面打开 Multipath Entitlement 选项。
+> 3. 设置 URLSessionConfiguration 中的 multipathServiceType 属性为非 none。
+
+> 另外，当用户开启 WIFi 助理的时候会对 MPTCP 造成一些限制：
+> 
+> - 当应用程序在后台的时候，WiFi 助理会阻止使用蜂窝网络数据。
+> - WIFi 助理会对程序使用的蜂窝网络流量进行限制。当达到最大限额的时候，WIFI 助手会禁用 MPTCP。
+
+## HTTP 策略和代理
+
+```swift
+var httpMaximumConnectionsPerHost: Int { get set }
+```
+
+当前 Session 中，针对一个主机地址同时进行的的最大连接数。默认值： macOS - 6；iOS - 4。
+
+```swift
+var httpShouldUsePipelining: Bool { get set }
+```
+
+是否可以使用 HTTP 管线化。 默认是 false。
+
+> HTTP 管线化是将多个请求整合在一起同时发出的网络请求机制。
+
+```swift
+var connectionProxyDictionary: [AnyHashable : Any]? { get set }
+```
+
+包含了此 Session 中的请求使用的代理。默认值是 nil（使用系统默认）。
+
+## 限制模式
+
+```swift
+var allowsConstrainedNetworkAccess: Bool { get set }
+```
+
+此属性表示当用户开启低数据模式时是 Session 中的任务否可以继续使用网络。
+
+在 iOS 13 及以后，用户可以在其蜂窝网络设置中打开低数据模式，以减少应用程序的流量使用。
+
+如果用户开启了低数据模式，并且此属性被设置为 false，这个 session 中所有的网络请求任务都会失败并返回错误：NSURLErrorNetworkUnavailableReason.constrained。
+
+> 我们可以通过一些设置来保证在低数据模式之下网络暂停，当低数据模式关闭之后继续任务：
+> 
+> 1. 设置 allowsConstrainedNetworkAccess 为 false
+> 2. 设置 waitsForConnectivity 为 true
+
+```swift
+var allowsExpensiveNetworkAccess: Bool { get set }
+```
+
+此属性表示是否允许使用昂贵的网络接口。
+
+系统会自动决定哪些属于昂贵的网络接口。在 iOS 13 中，大部分的蜂窝网络和热点都被认为是昂贵的。
+
+如果应用处于昂贵的网络条件下，并且此属性被设置为 false，这个 Session 中的所有任务都会失败并返回错误： NSURLErrorNetworkUnavailableReason.expensive。
+
+
+
 
 参考链接：
 
