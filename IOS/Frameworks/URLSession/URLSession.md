@@ -31,7 +31,22 @@ URLSession 用于进行网络请求中请求任务和数据传输的管理。
 - 当数据可以进行缓存时
 
 > session 会强引用 Delegate。当一个 session 已经不再使用时需要进行手动释放，以避免内存泄露。
+> 
+> ```swift
+> // 完成当前在进行的任务并释放 session。
+> func finishTasksAndInvalidate()
+> // 取消当前在进行的任务并释放 session
+> func invalidateAndCancel()
+> // 取消 session 会触发其 Delegate 调用以下函数
+> optional func urlSession(_ session: URLSession,  didBecomeInvalidWithError error: Error?)
+> ```
+> 
+> 取消函数在 URLSession.shared 单例中无效。
 
+
+##  线程安全
+
+URLSession 的 API 是线程安全的。session 和 task 可以在创建于任何线程的执行上下文。其代理会在正确的 DelegateQueue 中被执行。
 
 参考链接：
 
