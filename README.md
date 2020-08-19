@@ -39,6 +39,7 @@
 
 - [xcodebuild](IOS/Tools/Xcodebuild/Xcodebuild.md)
 - [Instruments](IOS/Tools/Instruments/Instruments.md)
+- [AutoDeployment](IOS/Tools/AutoDeployment/)
 
 ### 架构
 
