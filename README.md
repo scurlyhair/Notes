@@ -62,6 +62,7 @@
 ## 语言
 
 - [Swift](Language/Swift.md)
+- [Swift API 的可用性](Language/SwiftAPIAvailability.md)
 - [Swift关键字](Language/SwiftKeywords.md)
 <!--- [SwiftKeyPaths](Language/SwiftKeyPaths.md)-->
 - [Swift编译指令关键字](Language/SwiftCompilerKeyword.md)
