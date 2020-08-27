@@ -99,7 +99,7 @@ if | guard | while #available(platform version , platform version ..., *) …
 
 多个条件可以在判断语句中使用 `,` 分割，但不支持 `&&` 或 `||` 等逻辑操作符。
 
-```
+```swift
 // 应用示例
 @available(iOS 13.0, *)
 final class CustomCompositionalLayout: UICollectionViewCompositionalLayout { … }
