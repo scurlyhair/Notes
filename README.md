@@ -59,6 +59,7 @@
 	- 从 url 异步加载图片
 - [验证码产生器](IOS/Code/CaptchaView.swift)
 - [加密算法](IOS/Code/Crypto.swift)
+- [扫码器](IOS/Code/CodeScannerView.swift)
 
 ## 语言
 
