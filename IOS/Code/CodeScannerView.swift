@@ -1,6 +1,5 @@
 //
 //  ScannerCoverView.swift
-//  CodeScanner
 //
 //  Created by yunhui wu on 2020/9/1.
 //  Copyright © 2020 yunhui wu. All rights reserved.
@@ -8,9 +7,11 @@
 
 import UIKit
 
-class CodeScannerView: UIView {
+class ScannerCoverView: UIView {
     // MARK: - public
     
+    /// 背景透明度
+    var coverOpacity: Float = 0.5
     /// 扫描区域所占比例 0 ~ 1
     var scanAreaScale: CGFloat = 0.8
     /// 扫描边框宽度
@@ -47,7 +48,6 @@ class CodeScannerView: UIView {
     private lazy var scanView: UIView = {
         let tmp = UIView()
         tmp.center = self.bgView.center
-        tmp.bounds.size = CGSize(width: scanAreaWidth, height: scanAreaWidth)
         tmp.layer.borderColor = scanAreaBorderColor.cgColor
         tmp.layer.borderWidth = scanAreaBorderWidth
         return tmp
@@ -62,6 +62,9 @@ class CodeScannerView: UIView {
         tmp.frame.size = CGSize(width: scanLineLength, height: scanLineWidth)
         return tmp
     }()
+    
+    /// 覆盖层
+    private var coverLayer: CAShapeLayer?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -92,23 +95,25 @@ class CodeScannerView: UIView {
         scanView.center = bgView.center
         scanView.bounds.size = CGSize(width: scanAreaWidth, height: scanAreaWidth)
         scanLine.frame.origin = CGPoint(x: scanAreaBorderWidth, y: scanAreaBorderWidth)
-        scanLine.frame.size = CGSize(width: scanLineLength, height: 2)
+        scanLine.frame.size = CGSize(width: scanLineLength, height: scanLineWidth)
     }
     
     /// 中间镂空
     private func makeTransparent() {
+        coverLayer?.removeFromSuperlayer()
+        
         let overlayPath = UIBezierPath(rect: bgView.bounds)
         let transparentRectPath = UIBezierPath(rect: scanView.frame)
         overlayPath.append(transparentRectPath)
         overlayPath.usesEvenOddFillRule = true
         
-        let fillLayer = CAShapeLayer()
-        fillLayer.path = overlayPath.cgPath
-        fillLayer.fillRule = .evenOdd
-        fillLayer.fillColor = UIColor.black.cgColor
-        fillLayer.opacity = 0.5
+        coverLayer = CAShapeLayer()
+        coverLayer!.path = overlayPath.cgPath
+        coverLayer!.fillRule = .evenOdd
+        coverLayer!.fillColor = UIColor.black.cgColor
+        coverLayer!.opacity = coverOpacity
         
-        bgView.layer.addSublayer(fillLayer)
+        bgView.layer.addSublayer(coverLayer!)
     }
     
     /// 开始扫描动画
