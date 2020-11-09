@@ -136,6 +136,8 @@
 - [Homebrew](DeveloperTools/Homebrew.md)
 - [UML](DeveloperTools/UML.md)
 - [VPS+V2Ray](DeveloperTools/VPS_V2Ray.md)
+- [Charles](https://www.charlesproxy.com/download)
+	- 破解 [https://www.zzzmode.com/mytools/charles/](https://www.zzzmode.com/mytools/charles/)
 
 ## 网站类工具
 
